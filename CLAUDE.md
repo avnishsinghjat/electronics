@@ -127,3 +127,5 @@ one UI test + seed data so it is visible on a fresh install + user-guide page.
 - Local dev: `make dev` (needs PostgreSQL 16 on localhost:5432, see
   `backend/.env.example`). Full gate: `scripts/ci.sh`.
 - Backend venv: `backend/.venv` (Python 3.12). Frontend: `frontend/node_modules`.
+- The full phase prompts (Phases 0 to 15, fix prompt, release checklist) are in
+  `docs/roadmap/phases.md`. Build them in order, one gate at a time.
