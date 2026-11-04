@@ -60,7 +60,7 @@ select = ["E", "F", "W", "I", "B", "UP", "N", "ASYNC", "S", "RUF", "SIM", "PT"]
 ignore = ["S101", "B008"]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["S", "PT011"]
+"tests/**" = ["S", "PT011", "PT018", "E501"]
 
 [tool.mypy]
 python_version = "3.12"
@@ -73,3 +73,11 @@ exclude = ["migrations/versions/"]
 module = ["tests.*"]
 disallow_untyped_defs = false
 disallow_incomplete_defs = false
+disallow_subclassing_any = false
+disallow_untyped_calls = false
+warn_return_any = false
+
+[[tool.mypy.overrides]]
+module = ["factory", "factory.*"]
+follow_imports = "skip"
+ignore_missing_imports = true

@@ -22,6 +22,7 @@ from httpx import ASGITransport, AsyncClient
 from sqlalchemy import make_url, text
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
 
+from app import models as _models  # noqa: F401  (registers every table)
 from app.core.config import Settings, get_settings
 from app.core.db import get_session
 from app.main import create_app
@@ -68,6 +69,11 @@ async def engine(test_database_url: str) -> AsyncIterator[AsyncEngine]:
         async with admin.connect() as conn:
             await conn.execute(text(f'DROP DATABASE IF EXISTS "{db_name}" WITH (FORCE)'))
         await admin.dispose()
+
+
+@pytest.fixture(scope="session")
+def admin_url() -> str:
+    return ADMIN_URL
 
 
 @pytest_asyncio.fixture(loop_scope="session")

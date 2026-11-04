@@ -11,6 +11,8 @@ from fastapi import FastAPI, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm.exc import StaleDataError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 logger = logging.getLogger("fabtrack.errors")
@@ -114,6 +116,43 @@ async def _validation_error_handler(_: Request, exc: Exception) -> JSONResponse:
     )
 
 
+_SQLSTATE: dict[str, tuple[int, str, str]] = {
+    "23505": (409, "duplicate", "A record with the same unique values already exists"),
+    "23503": (409, "reference_error", "The record references, or is referenced by, another record"),
+    "23514": (422, "constraint_violation", "A value is outside the allowed range"),
+    "23502": (422, "missing_value", "A required value is missing"),
+}
+
+
+def integrity_error_info(exc: IntegrityError) -> tuple[int, str, str, dict[str, Any]]:
+    """Translate a database integrity error into (status, code, message, details)."""
+    orig = exc.orig
+    cause = getattr(orig, "__cause__", None)
+    sqlstate = getattr(orig, "sqlstate", None) or getattr(cause, "sqlstate", None) or ""
+    constraint = getattr(cause, "constraint_name", None) or getattr(orig, "constraint_name", None)
+    status, code, message = _SQLSTATE.get(
+        sqlstate, (409, "integrity_error", "Data integrity error")
+    )
+    return status, code, message, {"constraint": constraint}
+
+
+async def _integrity_error_handler(_: Request, exc: Exception) -> JSONResponse:
+    assert isinstance(exc, IntegrityError)
+    status, code, message, details = integrity_error_info(exc)
+    return JSONResponse(status_code=status, content=error_body(code, message, details))
+
+
+async def _stale_data_handler(_: Request, exc: Exception) -> JSONResponse:
+    assert isinstance(exc, StaleDataError)
+    return JSONResponse(
+        status_code=409,
+        content=error_body(
+            "stale_row_version",
+            "This record was changed by someone else. Reload and try again.",
+        ),
+    )
+
+
 async def _unhandled_error_handler(_: Request, exc: Exception) -> JSONResponse:
     logger.exception("unhandled_error", exc_info=exc)
     return JSONResponse(
@@ -126,4 +165,6 @@ def register_error_handlers(app: FastAPI) -> None:
     app.add_exception_handler(AppError, _app_error_handler)
     app.add_exception_handler(StarletteHTTPException, _http_error_handler)
     app.add_exception_handler(RequestValidationError, _validation_error_handler)
+    app.add_exception_handler(IntegrityError, _integrity_error_handler)
+    app.add_exception_handler(StaleDataError, _stale_data_handler)
     app.add_exception_handler(Exception, _unhandled_error_handler)

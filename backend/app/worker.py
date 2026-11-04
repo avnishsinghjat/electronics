@@ -1,23 +1,29 @@
 """Background worker process.
 
-Phase 0 provides the process, its lifecycle and its health signal: it verifies the
-database connection on every cycle and writes a heartbeat file that the Docker health
-check reads. The DB-backed job table and job handlers plug into ``run_cycle`` in Phase 1.
+Each cycle verifies the database connection, runs queued jobs (``app.core.jobs``)
+until the queue is empty or the per-cycle limit is reached, and writes a heartbeat
+file that the Docker health check reads.
 """
 
 import asyncio
 import logging
+import os
 import signal
+import socket
 import time
 from pathlib import Path
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+import app.models  # noqa: F401  (registers every table)
+from app.core import jobs
 from app.core.config import Settings, get_settings
 from app.core.db import dispose_engine, get_sessionmaker, ping
 from app.core.logging import configure_logging
 
 logger = logging.getLogger("fabtrack.worker")
+WORKER_ID = f"{socket.gethostname()}:{os.getpid()}"
+JOBS_PER_CYCLE = 20
 
 
 def write_heartbeat(path: Path, *, db_ok: bool) -> None:
@@ -43,6 +49,13 @@ async def run_cycle(sessionmaker: async_sessionmaker[AsyncSession]) -> bool:
     except Exception as exc:
         logger.warning("worker_db_unreachable", extra={"error": type(exc).__name__})
         return False
+    for _ in range(JOBS_PER_CYCLE):
+        try:
+            if not await jobs.run_one(sessionmaker, WORKER_ID):
+                break
+        except Exception as exc:  # a broken job must never kill the worker loop
+            logger.exception("worker_job_loop_error", extra={"error": type(exc).__name__})
+            break
     return True
 
 

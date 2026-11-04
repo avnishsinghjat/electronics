@@ -35,6 +35,24 @@ def app(app: FastAPI) -> FastAPI:
     async def custom() -> None:
         raise AppError("Qty must be positive", code="invalid_qty", status_code=400)
 
+    @app.get("/api/_probe/stale")
+    async def stale() -> None:
+        from sqlalchemy.orm.exc import StaleDataError
+
+        raise StaleDataError("UPDATE statement on table 'divisions' expected to update 1 row(s)")
+
+    @app.get("/api/_probe/duplicate")
+    async def duplicate() -> None:
+        from app.core.db import get_session as gs
+        from app.modules.org.models import Division
+
+        async for session in app.dependency_overrides[gs]():
+            session.add(Division(code="DUPX", name="a"))
+            await session.flush()
+            async with session.begin_nested():
+                session.add(Division(code="DUPX", name="b"))
+                await session.flush()
+
     @app.get("/api/_probe/http-dict")
     async def http_dict() -> None:
         raise HTTPException(status_code=400, detail={"field": "qty"})
@@ -129,3 +147,17 @@ async def test_http_exception_with_structured_detail(client: AsyncClient) -> Non
     assert err["code"] == "bad_request"
     assert err["message"] == "Bad Request"
     assert err["details"] == {"field": "qty"}
+
+
+async def test_stale_data_maps_to_409(client: AsyncClient) -> None:
+    resp = await client.get("/api/_probe/stale")
+    assert resp.status_code == 409
+    assert _assert_error_shape(resp.json())["code"] == "stale_row_version"
+
+
+async def test_unique_violation_maps_to_409_with_constraint(client: AsyncClient) -> None:
+    resp = await client.get("/api/_probe/duplicate")
+    assert resp.status_code == 409
+    err = _assert_error_shape(resp.json())
+    assert err["code"] == "duplicate"
+    assert err["details"] == {"constraint": "uq_divisions_code_live"}

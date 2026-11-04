@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 async def test_database_is_migrated_to_head(db_session: AsyncSession) -> None:
     version = (await db_session.execute(text("SELECT version_num FROM alembic_version"))).scalar()
-    assert version == "0001"
+    assert version == "0002"
 
 
 async def test_server_is_postgres_16_or_newer(db_session: AsyncSession) -> None:

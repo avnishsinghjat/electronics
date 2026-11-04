@@ -3,7 +3,7 @@
 Commands:
   check          verify database connectivity and DATA_DIR (exit 1 on failure)
   worker-health  exit 0 if the worker heartbeat is fresh (used by Docker)
-  seed           run all registered seeders (module seeders register from Phase 1)
+  seed           load reference data and sample data (idempotent)
   openapi        print the OpenAPI schema as JSON (committed to docs/api/openapi.json)
 """
 
@@ -15,13 +15,18 @@ from collections.abc import Awaitable, Callable
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+import app.models  # noqa: F401  (registers every table)
 from app.core.config import get_settings
 from app.core.db import dispose_engine, get_sessionmaker
 from app.modules.health.service import check_database, check_disk
+from app.seed import seed_reference_data, seed_sample_data
 from app.worker import heartbeat_is_fresh
 
 Seeder = Callable[[AsyncSession], Awaitable[int]]
-SEEDERS: list[tuple[str, Seeder]] = []
+SEEDERS: list[tuple[str, Seeder]] = [
+    ("reference data", seed_reference_data),
+    ("sample data", seed_sample_data),
+]
 
 
 async def _check() -> int:

@@ -9,14 +9,11 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     create_async_engine,
 )
-from sqlalchemy.orm import DeclarativeBase
 
 from app.core.config import Settings, get_settings
+from app.core.models import Base
 
-
-class Base(DeclarativeBase):
-    """Declarative base for all ORM models (mixins are added in Phase 1)."""
-
+__all__ = ["Base", "dispose_engine", "get_engine", "get_session", "get_sessionmaker", "ping"]
 
 _engine: AsyncEngine | None = None
 _sessionmaker: async_sessionmaker[AsyncSession] | None = None

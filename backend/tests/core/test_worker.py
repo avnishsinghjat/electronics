@@ -56,3 +56,25 @@ async def test_worker_loop_writes_heartbeat_and_stops(
     stop.set()
     await asyncio.wait_for(task, timeout=5)
     assert heartbeat_is_fresh(settings.worker_heartbeat_file, max_age_s=5)
+
+
+async def test_run_cycle_executes_queued_jobs(engine: AsyncEngine) -> None:
+    from sqlalchemy import delete
+
+    from app.core import jobs
+    from app.core.jobs import Job, JobContext, JobStatus
+
+    @jobs.job_handler("test.worker_cycle")
+    async def _handler(ctx: JobContext) -> dict[str, int]:
+        return {"ok": 1}
+
+    maker = async_sessionmaker(engine, expire_on_commit=False)
+    async with maker() as s, s.begin():
+        await s.execute(delete(Job))
+        job = await jobs.enqueue(s, "test.worker_cycle")
+    assert await run_cycle(maker) is True
+    async with maker() as s:
+        done = await s.get(Job, job.id)
+        assert done is not None and done.status == JobStatus.SUCCEEDED
+        await s.execute(delete(Job))
+        await s.commit()
