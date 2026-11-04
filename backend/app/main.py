@@ -1,0 +1,45 @@
+"""FastAPI application factory."""
+
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI
+
+from app import __version__
+from app.core.config import Settings, get_settings
+from app.core.db import dispose_engine
+from app.core.errors import register_error_handlers
+from app.core.logging import configure_logging
+from app.core.middleware import RequestContextMiddleware
+from app.modules.health.router import router as health_router
+
+API_PREFIX = "/api"
+
+
+def create_app(settings: Settings | None = None) -> FastAPI:
+    settings = settings or get_settings()
+    configure_logging(settings.log_level, json_output=settings.log_json)
+
+    @asynccontextmanager
+    async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+        settings.data_dir.mkdir(parents=True, exist_ok=True)
+        yield
+        await dispose_engine()
+
+    app = FastAPI(
+        title="FabTrack API",
+        version=__version__,
+        lifespan=lifespan,
+        openapi_url=f"{API_PREFIX}/openapi.json",
+        # Swagger UI / ReDoc load their assets from a CDN, which the offline rule forbids.
+        # The machine-readable schema is served at /api/openapi.json instead.
+        docs_url=None,
+        redoc_url=None,
+    )
+    app.add_middleware(RequestContextMiddleware)
+    register_error_handlers(app)
+    app.include_router(health_router, prefix=API_PREFIX)
+    return app
+
+
+app = create_app()

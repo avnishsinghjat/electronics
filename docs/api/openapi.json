@@ -1,0 +1,215 @@
+{
+  "components": {
+    "schemas": {
+      "DatabaseHealth": {
+        "properties": {
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "latency_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latency Ms"
+          },
+          "status": {
+            "enum": [
+              "ok",
+              "degraded",
+              "error"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "latency_ms"
+        ],
+        "title": "DatabaseHealth",
+        "type": "object"
+      },
+      "DiskHealth": {
+        "properties": {
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "free_bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Free Bytes"
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "ok",
+              "degraded",
+              "error"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "total_bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Bytes"
+          }
+        },
+        "required": [
+          "status",
+          "path",
+          "free_bytes",
+          "total_bytes"
+        ],
+        "title": "DiskHealth",
+        "type": "object"
+      },
+      "HealthResponse": {
+        "properties": {
+          "air_gapped": {
+            "title": "Air Gapped",
+            "type": "boolean"
+          },
+          "database": {
+            "$ref": "#/components/schemas/DatabaseHealth"
+          },
+          "disk": {
+            "$ref": "#/components/schemas/DiskHealth"
+          },
+          "environment": {
+            "title": "Environment",
+            "type": "string"
+          },
+          "llm": {
+            "$ref": "#/components/schemas/LlmHealth"
+          },
+          "status": {
+            "enum": [
+              "ok",
+              "degraded"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "version",
+          "environment",
+          "air_gapped",
+          "database",
+          "disk",
+          "llm"
+        ],
+        "title": "HealthResponse",
+        "type": "object"
+      },
+      "LlmHealth": {
+        "properties": {
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          },
+          "provider": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider"
+          },
+          "status": {
+            "enum": [
+              "not_configured",
+              "ok",
+              "degraded",
+              "error",
+              "disabled"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "provider",
+          "detail"
+        ],
+        "title": "LlmHealth",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "title": "FabTrack API",
+    "version": "0.0.1"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/health": {
+      "get": {
+        "description": "Version, database status, free disk in DATA_DIR and LLM provider status.\n\nPublic (no auth): used by Docker health checks and the top-bar status indicator.",
+        "operationId": "health_api_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "System health",
+        "tags": [
+          "system"
+        ]
+      }
+    }
+  }
+}

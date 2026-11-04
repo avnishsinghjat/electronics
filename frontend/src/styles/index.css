@@ -1,0 +1,41 @@
+@import "./fonts.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Phase 0 base theme (shadcn/ui CSS variables). The full token set and the textured
+   canvas are built in Phase 2 (src/design). */
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222 30% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 30% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 30% 12%;
+    --primary: 224 75% 48%; /* #1F4FD8 engineering blue */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 20% 97%;
+    --secondary-foreground: 222 30% 12%;
+    --muted: 220 20% 97%;
+    --muted-foreground: 220 9% 40%;
+    --accent: 178 84% 34%; /* #0E9F9A teal */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 46%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 91%; /* #E6E8EC */
+    --input: 220 13% 91%;
+    --ring: 224 75% 48%;
+    --radius: 0.5rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "cv11", "ss01";
+  }
+}

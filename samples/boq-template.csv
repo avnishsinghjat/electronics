@@ -1,0 +1,5 @@
+line_no,ref_des,qty_per_unit,mpn,manufacturer,description,value,package,category,unit,dnp,preferred_vendor,unit_price_inr,notes
+1,"C1,C2,C5",3,GRM188R71H104KA93D,Murata,Cap MLCC 100nF 50V X7R,100nF,0603,Passive,pcs,N,,1.20,
+2,R1,1,RC0603FR-0710KL,Yageo,Res 10k 1% 0.1W,10k,0603,Passive,pcs,N,,0.40,
+3,U1,1,STM32F407VGT6,STMicroelectronics,MCU ARM Cortex-M4,,LQFP-100,IC,pcs,N,,780.00,MSL3
+4,J1,1,,,Header 2x5 2.54mm,,THT,Connector,pcs,Y,,,Do not populate

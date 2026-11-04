@@ -1,0 +1,92 @@
+# FabTrack stack: postgres, api, worker, web (nginx + SPA).
+# Usage (from repo root):
+#   cp deploy/.env.example deploy/.env   # then set POSTGRES_PASSWORD
+#   docker compose -f deploy/docker-compose.yml --env-file deploy/.env up -d
+name: fabtrack
+
+x-backend-env: &backend-env
+  FABTRACK_ENV: production
+  FABTRACK_DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-fabtrack}:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in deploy/.env}@postgres:5432/${POSTGRES_DB:-fabtrack}
+  FABTRACK_DATA_DIR: /data
+  FABTRACK_LOG_LEVEL: ${FABTRACK_LOG_LEVEL:-INFO}
+  FABTRACK_AIR_GAPPED: ${FABTRACK_AIR_GAPPED:-true}
+
+services:
+  postgres:
+    # pgvector build of PostgreSQL 16 (vector search is used from Phase 9 onwards).
+    image: pgvector/pgvector:pg16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-fabtrack}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in deploy/.env}
+      POSTGRES_DB: ${POSTGRES_DB:-fabtrack}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
+
+  api:
+    image: fabtrack/api:${FABTRACK_VERSION:-0.0.1}
+    build:
+      context: ../backend
+    restart: unless-stopped
+    environment: *backend-env
+    volumes:
+      - appdata:/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import json,sys,urllib.request as u; d=json.load(u.urlopen('http://127.0.0.1:8000/api/health',timeout=4)); sys.exit(0 if d['database']['status']=='ok' else 1)"
+      interval: 15s
+      timeout: 6s
+      retries: 4
+      start_period: 30s
+
+  worker:
+    image: fabtrack/api:${FABTRACK_VERSION:-0.0.1}
+    restart: unless-stopped
+    command: ["python", "-m", "app.worker"]
+    environment: *backend-env
+    volumes:
+      - appdata:/data
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-m", "app.cli", "worker-health", "--max-age", "30"]
+      interval: 15s
+      timeout: 6s
+      retries: 4
+      start_period: 15s
+
+  web:
+    image: fabtrack/web:${FABTRACK_VERSION:-0.0.1}
+    build:
+      context: ../frontend
+      additional_contexts:
+        deploy: .
+    restart: unless-stopped
+    ports:
+      - "${FABTRACK_HTTP_PORT:-8080}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 4
+      start_period: 10s
+
+volumes:
+  pgdata:
+  appdata:
