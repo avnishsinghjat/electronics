@@ -31,7 +31,7 @@ export default tseslint.config(
   },
   {
     // TanStack Table/Virtual return non-memoisable functions; we do not use the React Compiler.
-    files: ["src/design/components/data-table/**"],
+    files: ["src/design/components/data-table/**", "src/features/boq/BoqGrid.tsx"],
     rules: { "react-hooks/incompatible-library": "off" },
   },
   {

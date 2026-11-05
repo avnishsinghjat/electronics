@@ -42,6 +42,8 @@ export default defineConfig({
               process.env.FABTRACK_E2E_DATABASE_URL ??
               "postgresql+asyncpg://postgres:postgres@localhost:5432/fabtrack_e2e",
             FABTRACK_DATA_DIR: "./var/e2e-data",
+            // Background jobs (BOQ parse/validate) run inside the API process for e2e.
+            FABTRACK_RUN_JOBS_IN_API: "true",
           },
         },
         {

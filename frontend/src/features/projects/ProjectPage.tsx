@@ -26,6 +26,7 @@ import {
 } from "@/design/components";
 import type { StatusTone } from "@/design/tokens";
 import { Attachments } from "@/features/attachments/Attachments";
+import { BoqPanel } from "@/features/boq/BoqPanel";
 import { useCan } from "@/features/auth/AuthContext";
 import { ApiError } from "@/lib/api";
 import { fmtDate } from "@/lib/format";
@@ -226,6 +227,7 @@ export default function ProjectPage() {
   const [params, setParams] = useSearchParams();
   const canManage = useCan("projects:manage");
   const canHistory = useCan("projects:history");
+  const canBoq = useCan("boq:read");
   const tree = useProjectTree(projectId);
   const { deleteProject } = useOrgMutations();
   const [editing, setEditing] = React.useState(false);
@@ -257,7 +259,7 @@ export default function ProjectPage() {
 
   const p = tree.data.project;
   const s = statusInfo(p.status);
-  const extraTabs = Object.entries(PROJECT_TABS).filter(([, t]) => t.live || preview);
+  const extraTabs = Object.entries(PROJECT_TABS).filter(([key, t]) => (t.live && (key !== "boq" || canBoq)) || preview);
 
   return (
     <>
@@ -318,7 +320,7 @@ export default function ProjectPage() {
 
         {extraTabs.map(([key, t]) => (
           <TabsContent key={key} value={key}>
-            <RoadmapTab label={t.label} phase={t.phase} />
+            {key === "boq" && t.live ? <BoqPanel tree={tree.data} /> : <RoadmapTab label={t.label} phase={t.phase} />}
           </TabsContent>
         ))}
 

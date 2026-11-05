@@ -18,7 +18,7 @@ export type FeatureName = keyof typeof FEATURES;
  *  set localStorage `fabtrack.preview-tabs` to "1" to see their "delivered in Phase N"
  *  placeholders (useful when demoing the roadmap). */
 export const PROJECT_TABS: Record<string, { label: string; phase: number; live: boolean }> = {
-  boq: { label: "BOQ", phase: 5, live: false },
+  boq: { label: "BOQ", phase: 5, live: true },
   procurement: { label: "Procurement", phase: 6, live: false },
   production: { label: "Production", phase: 7, live: false },
   qc: { label: "QC", phase: 8, live: false },

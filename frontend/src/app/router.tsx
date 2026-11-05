@@ -20,10 +20,11 @@ const UsersPage = lazy(() => import("@/features/settings/UsersPage"));
 const AuditLogPage = lazy(() => import("@/features/settings/AuditLogPage"));
 const ProjectsPage = lazy(() => import("@/features/projects/ProjectsPage"));
 const ProjectPage = lazy(() => import("@/features/projects/ProjectPage"));
+const BoqListPage = lazy(() => import("@/features/boq/BoqListPage"));
 
 /** Sections whose module is not built yet render the roadmap page. Each phase replaces
  *  its entry with the real lazily-loaded feature route. */
-const BUILT = new Set(["dashboard", "settings", "projects"]);
+const BUILT = new Set(["dashboard", "settings", "projects", "boq"]);
 const roadmapRoutes: RouteObject[] = NAV_ITEMS.filter((n) => !BUILT.has(n.id)).map((n) => ({
   path: n.to.slice(1),
   element: (
@@ -52,6 +53,7 @@ export const routes: RouteObject[] = [
               { index: true, element: <HomeRoute dashboard={<DashboardPage />} /> },
               ...roadmapRoutes,
               { path: "projects", element: <RequirePermission permission="projects:read"><ProjectsPage /></RequirePermission> },
+              { path: "boq", element: <RequirePermission permission="boq:read"><BoqListPage /></RequirePermission> },
               { path: "projects/:projectId", element: <RequirePermission permission="projects:read"><ProjectPage /></RequirePermission> },
               {
                 path: "settings",
