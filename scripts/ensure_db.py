@@ -1,7 +1,8 @@
 """Create a PostgreSQL database if it does not exist.
 
-Usage: python scripts/ensure_db.py postgresql+asyncpg://user:pass@host:5432/dbname
+Usage: python scripts/ensure_db.py [--recreate] postgresql+asyncpg://user:pass@host:5432/dbname
 Connects to the server's ``postgres`` maintenance database with the same credentials.
+``--recreate`` drops it first (used for the throwaway end-to-end database only).
 """
 
 import asyncio
@@ -11,7 +12,7 @@ import asyncpg
 from sqlalchemy import make_url
 
 
-async def ensure(url: str) -> None:
+async def ensure(url: str, *, recreate: bool = False) -> None:
     target = make_url(url)
     name = target.database
     if not name:
@@ -24,6 +25,9 @@ async def ensure(url: str) -> None:
         database="postgres",
     )
     try:
+        if recreate:
+            await conn.execute(f'DROP DATABASE IF EXISTS "{name}" WITH (FORCE)')
+            print(f"database {name}: dropped")
         exists = await conn.fetchval("SELECT 1 FROM pg_database WHERE datname = $1", name)
         if exists:
             print(f"database {name}: exists")
@@ -35,6 +39,7 @@ async def ensure(url: str) -> None:
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
+    args = [a for a in sys.argv[1:] if a != "--recreate"]
+    if len(args) != 1:
         raise SystemExit(__doc__)
-    asyncio.run(ensure(sys.argv[1]))
+    asyncio.run(ensure(args[0], recreate="--recreate" in sys.argv[1:]))

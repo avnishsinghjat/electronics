@@ -1,9 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, stubHealth, test } from "./fixtures";
 
-import { stubHealth } from "./fixtures";
-
-const PAGES = ["/dev/ui", "/", "/projects", "/missing"];
+const PAGES = ["/dev/ui", "/", "/projects", "/missing", "/settings/general", "/settings/users", "/settings/audit", "/change-password"];
 
 for (const path of PAGES) {
   test(`axe: no serious or critical violations on ${path}`, async ({ page }) => {
@@ -31,4 +29,15 @@ test("axe: open dialog and command palette are accessible", async ({ page }) => 
   await expect(page.getByRole("dialog", { name: "Command palette" })).toBeVisible();
   results = await new AxeBuilder({ page }).include('[role="dialog"]').analyze();
   expect(results.violations.filter((v) => v.impact === "serious" || v.impact === "critical")).toEqual([]);
+});
+
+test.describe("anonymous pages", () => {
+  test.use({ loginAs: null });
+
+  test("axe: login page", async ({ page }) => {
+    await page.goto("/login");
+    await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
+    const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
+    expect(results.violations.filter((v) => v.impact === "serious" || v.impact === "critical")).toEqual([]);
+  });
 });

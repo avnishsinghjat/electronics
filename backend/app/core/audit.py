@@ -11,7 +11,7 @@ from datetime import date, datetime
 from decimal import Decimal
 from typing import Any
 
-from sqlalchemy import BigInteger, DateTime, Index, String, Uuid, event, insert, inspect
+from sqlalchemy import BigInteger, DateTime, ForeignKey, Index, String, event, insert, inspect
 from sqlalchemy.orm import Mapped, Session, UOWTransaction, mapped_column
 
 from app.core.context import current_actor_id
@@ -25,6 +25,11 @@ class AuditAction(enum.StrEnum):
     SOFT_DELETE = "soft_delete"
     RESTORE = "restore"
     DELETE = "delete"
+    # Security events written explicitly by the auth service.
+    LOGIN = "login"
+    LOGIN_FAILED = "login_failed"
+    LOCKED = "locked"
+    LOGOUT = "logout"
 
 
 class AuditLog(Base):
@@ -36,7 +41,9 @@ class AuditLog(Base):
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
     occurred_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
-    actor_id: Mapped[uuid.UUID | None] = mapped_column(Uuid(), index=True)
+    actor_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("users.id", ondelete="RESTRICT"), index=True
+    )
     action: Mapped[str] = mapped_column(String(16))
     entity_type: Mapped[str] = mapped_column(String(64))
     entity_id: Mapped[str] = mapped_column(String(64))
@@ -66,19 +73,33 @@ def _columns(obj: Any) -> list[str]:
     return [attr.key for attr in inspect(obj).mapper.column_attrs]
 
 
+REDACTED = "[redacted]"
+
+
+def _redacted(obj: Any) -> frozenset[str]:
+    """Columns never written to the audit log in clear (e.g. password hashes)."""
+    return frozenset(getattr(type(obj), "__audit_redact__", ()))
+
+
 def _snapshot(obj: Any) -> dict[str, Any]:
-    return {key: _json_value(getattr(obj, key)) for key in _columns(obj)}
+    hidden = _redacted(obj)
+    return {
+        key: REDACTED if key in hidden else _json_value(getattr(obj, key)) for key in _columns(obj)
+    }
 
 
 def _before_snapshot(obj: Any) -> tuple[dict[str, Any], list[str]]:
     state = inspect(obj)
+    hidden = _redacted(obj)
     before: dict[str, Any] = {}
     changed: list[str] = []
     for key in _columns(obj):
         hist = state.attrs[key].history
         if hist.has_changes() and key not in ("updated_at", "updated_by", "row_version"):
             changed.append(key)
-        if hist.deleted:
+        if key in hidden:
+            before[key] = REDACTED
+        elif hist.deleted:
             before[key] = _json_value(hist.deleted[0])
         elif hist.unchanged:
             before[key] = _json_value(hist.unchanged[0])
@@ -164,3 +185,28 @@ def _write_audit(session: Session, _ctx: UOWTransaction) -> None:
 
     if rows:
         session.connection().execute(insert(AuditLog), rows)
+
+
+async def record_event(
+    session: Any,
+    action: AuditAction,
+    *,
+    entity_type: str,
+    entity_id: str,
+    actor_id: uuid.UUID | None = None,
+    details: dict[str, Any] | None = None,
+) -> None:
+    """Write an explicit audit event (not tied to a row change), e.g. a failed login."""
+    await session.execute(
+        insert(AuditLog).values(
+            occurred_at=utcnow(),
+            actor_id=actor_id,
+            action=action.value,
+            entity_type=entity_type,
+            entity_id=entity_id,
+            before=None,
+            after=_json_value(details) if details else None,
+            changed_fields=None,
+            request_id=request_id_var.get(),
+        )
+    )

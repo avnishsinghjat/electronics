@@ -53,7 +53,9 @@ async def test_upgrade_downgrade_upgrade(empty_db: str) -> None:
     await asyncio.to_thread(command.downgrade, cfg, "base")
     assert await _tables(empty_db) == {"alembic_version"}
     await asyncio.to_thread(command.upgrade, cfg, "head")
-    assert len(await _tables(empty_db)) == 43  # 42 domain/core tables + alembic_version
+    from app.models import Base
+
+    assert await _tables(empty_db) == set(Base.metadata.tables) | {"alembic_version"}
 
 
 async def test_models_match_migrations(empty_db: str) -> None:

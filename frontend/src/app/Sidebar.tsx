@@ -5,7 +5,9 @@ import { Link, useMatch, useResolvedPath } from "react-router-dom";
 import { Tooltip } from "@/design/components";
 import { cn } from "@/lib/utils";
 
-import { NAV_ITEMS, type NavItem } from "./navigation";
+import { useAuth } from "@/features/auth/AuthContext";
+
+import { type NavItem, visibleNavItems } from "./navigation";
 
 /** A sidebar link with a plain-string className, so it can be a Radix Slot child (Tooltip
  *  trigger) without NavLink's function className being stringified. */
@@ -35,6 +37,8 @@ const SidebarLink = React.forwardRef<HTMLAnchorElement, { item: NavItem; collaps
 SidebarLink.displayName = "SidebarLink";
 
 export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {
+  const { user } = useAuth();
+  const items = visibleNavItems(user?.permissions ?? []);
   return (
     <aside
       data-shell="sidebar"
@@ -55,7 +59,7 @@ export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle:
       </div>
       <nav aria-label="Main navigation" className="flex-1 overflow-y-auto px-2 py-3">
         <ul className="space-y-0.5">
-          {NAV_ITEMS.map((item) => {
+          {items.map((item) => {
             const link = <SidebarLink item={item} collapsed={collapsed} />;
             return (
               <li key={item.id}>

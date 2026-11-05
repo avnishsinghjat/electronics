@@ -12,6 +12,10 @@ dependencies = [
   "asyncpg>=0.29",
   "alembic>=1.13",
   "httpx>=0.27",
+  "argon2-cffi>=23",
+  "pyjwt>=2.9",
+  "python-multipart>=0.0.9",
+  "email-validator>=2",
 ]
 
 [project.optional-dependencies]
@@ -45,6 +49,9 @@ filterwarnings = ["error::pytest.PytestUnraisableExceptionWarning"]
 [tool.coverage.run]
 source = ["app"]
 branch = true
+# SQLAlchemy's async layer runs ORM code in greenlets; without this, lines after an
+# await are under-reported.
+concurrency = ["greenlet", "thread"]
 
 [tool.coverage.report]
 show_missing = true

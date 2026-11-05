@@ -1,6 +1,4 @@
-import { expect, test } from "@playwright/test";
-
-import { fontsReady, stubHealth } from "./fixtures";
+import { expect, fontsReady, stubHealth, test } from "./fixtures";
 
 const SIZES = [
   { width: 1366, height: 768 },
@@ -48,4 +46,15 @@ test("print stylesheet hides the app chrome", async ({ page }) => {
   await expect(page.locator('header[data-shell="topbar"]')).toBeHidden();
   await expect(page.getByRole("heading", { level: 1, name: "UI kit" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Show toast" })).toBeHidden();
+});
+
+test.describe("login page", () => {
+  test.use({ loginAs: null, viewport: { width: 1366, height: 768 } });
+
+  test("sign-in card", async ({ page }) => {
+    await page.goto("/login");
+    await expect(page.getByText("Sahyadri Electronics (E2E)")).toBeVisible();
+    await fontsReady(page);
+    await expect(page).toHaveScreenshot("login-1366.png", { animations: "disabled" });
+  });
 });

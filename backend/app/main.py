@@ -11,7 +11,12 @@ from app.core.db import dispose_engine
 from app.core.errors import register_error_handlers
 from app.core.logging import configure_logging
 from app.core.middleware import RequestContextMiddleware
+from app.modules.audit.router import router as audit_router
+from app.modules.auth.router import router as auth_router
 from app.modules.health.router import router as health_router
+from app.modules.org.router import router as org_router
+from app.modules.settings.router import router as settings_router
+from app.modules.users.router import router as users_router
 
 API_PREFIX = "/api"
 
@@ -38,7 +43,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     app.add_middleware(RequestContextMiddleware)
     register_error_handlers(app)
-    app.include_router(health_router, prefix=API_PREFIX)
+    for router in (
+        health_router,
+        auth_router,
+        settings_router,
+        users_router,
+        audit_router,
+        org_router,
+    ):
+        app.include_router(router, prefix=API_PREFIX)
     return app
 
 

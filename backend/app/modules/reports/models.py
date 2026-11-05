@@ -48,9 +48,9 @@ class QcReport(BusinessMixin, Base):
     source_data: Mapped[dict[str, Any] | None] = mapped_column(JsonB)
     pdf_file_id: Mapped[uuid.UUID | None] = fk("files.id", nullable=True)
     pdf_sha256: Mapped[str | None] = mapped_column(String(64), index=True)
-    reviewed_by: Mapped[uuid.UUID | None]
+    reviewed_by: Mapped[uuid.UUID | None] = fk("users.id", nullable=True)
     reviewed_at: Mapped[datetime | None]
-    approved_by: Mapped[uuid.UUID | None]
+    approved_by: Mapped[uuid.UUID | None] = fk("users.id", nullable=True)
     approved_at: Mapped[datetime | None]
     issued_at: Mapped[datetime | None]
 
@@ -72,7 +72,7 @@ class DocumentDraft(BusinessMixin, Base):
     status: Mapped[str] = status_column(ReportStatus, ReportStatus.DRAFT)
     content: Mapped[dict[str, Any]] = mapped_column(JsonB, default=dict)
     source_data: Mapped[dict[str, Any] | None] = mapped_column(JsonB)
-    approved_by: Mapped[uuid.UUID | None]
+    approved_by: Mapped[uuid.UUID | None] = fk("users.id", nullable=True)
     approved_at: Mapped[datetime | None]
 
 
@@ -87,5 +87,5 @@ class DesignEvaluation(BusinessMixin, Base):
     source_file_id: Mapped[uuid.UUID | None] = fk("files.id", nullable=True)
     summary: Mapped[dict[str, Any] | None] = mapped_column(JsonB)
     notes: Mapped[str | None] = mapped_column(Text)
-    signed_off_by: Mapped[uuid.UUID | None]
+    signed_off_by: Mapped[uuid.UUID | None] = fk("users.id", nullable=True)
     signed_off_at: Mapped[datetime | None]

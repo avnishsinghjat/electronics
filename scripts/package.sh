@@ -48,7 +48,7 @@ FabTrack ${VERSION} offline bundle
 
 1. Verify:   sha256sum -c SHA256SUMS
 2. Load:     docker load -i images.tar
-3. Configure: cp .env.example .env   (set POSTGRES_PASSWORD)
+3. Configure: cp .env.example .env   (set POSTGRES_PASSWORD and FABTRACK_SECRET_KEY=\$(openssl rand -hex 32))
 4. Start:    docker compose --env-file .env up -d --wait
 5. Open:     http://<server>:8080  (port: FABTRACK_HTTP_PORT)
 EOF

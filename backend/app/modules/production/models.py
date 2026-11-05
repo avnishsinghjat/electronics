@@ -156,5 +156,5 @@ class StageProgress(BusinessMixin, Base):
     completed_at: Mapped[datetime | None]
     qty_passed: Mapped[int] = mapped_column(Integer, default=0)
     qty_failed: Mapped[int] = mapped_column(Integer, default=0)
-    operator_id: Mapped[uuid.UUID | None] = mapped_column(index=True)
+    operator_id: Mapped[uuid.UUID | None] = fk("users.id", nullable=True)
     notes: Mapped[str | None] = mapped_column(Text)

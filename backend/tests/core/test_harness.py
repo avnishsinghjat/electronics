@@ -4,9 +4,24 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
+def _migration_head() -> str | None:
+    from pathlib import Path
+
+    from alembic.config import Config
+    from alembic.script import ScriptDirectory
+
+    backend = Path(__file__).resolve().parents[2]
+    cfg = Config(str(backend / "alembic.ini"))
+    cfg.set_main_option("script_location", str(backend / "migrations"))
+    return ScriptDirectory.from_config(cfg).get_current_head()
+
+
+HEAD = _migration_head()
+
+
 async def test_database_is_migrated_to_head(db_session: AsyncSession) -> None:
     version = (await db_session.execute(text("SELECT version_num FROM alembic_version"))).scalar()
-    assert version == "0002"
+    assert version == HEAD
 
 
 async def test_server_is_postgres_16_or_newer(db_session: AsyncSession) -> None:

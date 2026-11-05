@@ -19,7 +19,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.context import current_actor_id
 from app.core.errors import AppError
-from app.core.models import Base, BusinessMixin, JsonB
+from app.core.models import Base, BusinessMixin, JsonB, fk
 
 CHUNK = 1024 * 1024
 
@@ -33,7 +33,7 @@ class StoredFile(BusinessMixin, Base):
     mime: Mapped[str] = mapped_column(String(127))
     size_bytes: Mapped[int] = mapped_column(BigInteger)
     storage_path: Mapped[str] = mapped_column(String(255))
-    uploaded_by: Mapped[uuid.UUID | None] = mapped_column(index=True)
+    uploaded_by: Mapped[uuid.UUID | None] = fk("users.id", nullable=True)
     ref_type: Mapped[str | None] = mapped_column(String(64))
     ref_id: Mapped[uuid.UUID | None]
     exif_json: Mapped[dict[str, Any] | None] = mapped_column(JsonB)

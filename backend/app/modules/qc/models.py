@@ -123,7 +123,7 @@ class QcInspection(BusinessMixin, Base):
     grn_line_id: Mapped[uuid.UUID | None] = fk("grn_lines.id", nullable=True)
     stage_code: Mapped[str] = mapped_column(String(32), index=True)
     status: Mapped[str] = status_column(InspectionStatus, InspectionStatus.PENDING)
-    inspector_id: Mapped[uuid.UUID | None] = mapped_column(index=True)
+    inspector_id: Mapped[uuid.UUID | None] = fk("users.id", nullable=True)
     started_at: Mapped[datetime | None]
     completed_at: Mapped[datetime | None]
     reinspection_of_id: Mapped[uuid.UUID | None] = fk("qc_inspections.id", nullable=True)
@@ -171,5 +171,5 @@ class Ncr(BusinessMixin, Base):
     rework_notes: Mapped[str | None] = mapped_column(Text)
     status: Mapped[str] = status_column(NcrStatus, NcrStatus.OPEN)
     reinspection_id: Mapped[uuid.UUID | None] = fk("qc_inspections.id", nullable=True)
-    closed_by: Mapped[uuid.UUID | None]
+    closed_by: Mapped[uuid.UUID | None] = fk("users.id", nullable=True)
     closed_at: Mapped[datetime | None]

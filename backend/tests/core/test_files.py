@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.context import acting_as
 from app.core.errors import AppError
 from app.core.files import object_path, store_file, verify_object, write_object
+from tests.factories import make_user
 
 JPEG_BYTES = b"\xff\xd8\xff\xe0" + b"fabtrack-test-image" * 50
 
@@ -16,7 +17,7 @@ async def test_store_file_content_addressed_with_metadata(
     db_session: AsyncSession, tmp_path: Path
 ) -> None:
     ref = uuid.uuid4()
-    uploader = uuid.uuid4()
+    uploader = (await make_user(db_session)).id
     with acting_as(uploader):
         record = await store_file(
             db_session,

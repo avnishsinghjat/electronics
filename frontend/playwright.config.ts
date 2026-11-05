@@ -11,6 +11,7 @@ const isCI = Boolean(process.env.CI);
 
 export default defineConfig({
   testDir: "./e2e",
+  globalSetup: "./e2e/global-setup.ts",
   outputDir: "./test-results",
   snapshotPathTemplate: "{testDir}/__screenshots__/{testFilePath}/{arg}{ext}",
   // Tight tolerance: anti-aliasing noise only. A real regression changes far more pixels.

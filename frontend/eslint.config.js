@@ -26,7 +26,7 @@ export default tseslint.config(
   {
     // Library and wiring modules export variants/constants next to components; the rule
     // only affects dev-server hot reload, not correctness.
-    files: ["src/design/**", "src/app/**"],
+    files: ["src/**"],
     rules: { "react-refresh/only-export-components": "off" },
   },
   {
@@ -37,5 +37,10 @@ export default tseslint.config(
   {
     files: ["tests/**", "e2e/**"],
     rules: { "no-restricted-syntax": "off", "@typescript-eslint/no-non-null-assertion": "off" },
+  },
+  {
+    // Playwright fixtures call `use()`, which is not a React hook.
+    files: ["e2e/**"],
+    rules: { "react-hooks/rules-of-hooks": "off" },
   },
 );

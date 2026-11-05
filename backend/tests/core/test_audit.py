@@ -7,7 +7,7 @@ from app.core.audit import AuditLog
 from app.core.context import acting_as
 from app.core.repository import Repository
 from app.modules.org.models import Division
-from tests.factories import DivisionFactory, create
+from tests.factories import DivisionFactory, create, make_user
 
 
 class DivisionRepo(Repository[Division]):
@@ -22,7 +22,7 @@ async def _audit(session: AsyncSession, entity_id: uuid.UUID) -> list[AuditLog]:
 
 
 async def test_insert_writes_after_image_and_actor(db_session: AsyncSession) -> None:
-    actor = uuid.uuid4()
+    actor = (await make_user(db_session)).id
     with acting_as(actor):
         division = await create(db_session, DivisionFactory, code="AUD-1", name="Audit test")
     [row] = await _audit(db_session, division.id)
@@ -41,7 +41,7 @@ async def test_insert_writes_after_image_and_actor(db_session: AsyncSession) -> 
 
 async def test_update_writes_before_and_after(db_session: AsyncSession) -> None:
     division = await create(db_session, DivisionFactory, code="AUD-2", name="Old name")
-    editor = uuid.uuid4()
+    editor = (await make_user(db_session)).id
     with acting_as(editor):
         await DivisionRepo(db_session).update(division, {"name": "New name"}, expected_version=1)
     rows = await _audit(db_session, division.id)

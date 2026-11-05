@@ -5,13 +5,19 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import Settings, get_settings
 from app.core.db import get_session
+from app.modules.auth.deps import public
 from app.modules.health import service
 from app.modules.health.schemas import HealthResponse
 
 router = APIRouter(tags=["system"])
 
 
-@router.get("/health", response_model=HealthResponse, summary="System health")
+@router.get(
+    "/health",
+    response_model=HealthResponse,
+    summary="System health",
+    dependencies=[Depends(public)],
+)
 async def health(
     session: Annotated[AsyncSession, Depends(get_session)],
     settings: Annotated[Settings, Depends(get_settings)],

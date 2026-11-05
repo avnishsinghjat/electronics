@@ -6,7 +6,9 @@ import { Skeleton } from "@/design/components";
 import { readPref, writePref } from "@/lib/storage";
 
 import { CommandPalette, useCommandPaletteShortcut } from "./CommandPalette";
+import { isEnabled } from "./features";
 import { LlmStatus } from "./LlmStatus";
+import { UserMenu } from "./UserMenu";
 import { Sidebar } from "./Sidebar";
 
 function PageFallback() {
@@ -50,6 +52,7 @@ export function Shell() {
           </button>
           <div className="ml-auto flex items-center gap-2">
             <LlmStatus />
+            {isEnabled("auth") && <UserMenu />}
           </div>
         </header>
         <main id="main" className="app-canvas flex-1 px-6 py-6">

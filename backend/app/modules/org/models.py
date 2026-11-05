@@ -66,8 +66,7 @@ class Project(BusinessMixin, Base):
     start_date: Mapped[date | None] = mapped_column(Date)
     due_date: Mapped[date | None] = mapped_column(Date)
     status: Mapped[str] = status_column(ProjectStatus, ProjectStatus.DRAFT)
-    # FK to users is added with the users table in Phase 3.
-    project_manager_id: Mapped[uuid.UUID | None] = mapped_column(index=True)
+    project_manager_id: Mapped[uuid.UUID | None] = fk("users.id", nullable=True)
     notes: Mapped[str | None] = mapped_column(Text)
     is_sample: Mapped[bool] = mapped_column(Boolean, default=False)
 

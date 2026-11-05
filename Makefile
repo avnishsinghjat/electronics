@@ -32,8 +32,8 @@ test-backend: ## Backend unit and API tests with coverage
 test-frontend: ## Frontend unit tests (Vitest)
 	cd $(FRONTEND) && npx vitest run --coverage
 
-e2e: ## Playwright end-to-end tests (starts API and built SPA itself)
-	$(PY) scripts/ensure_db.py "$(FABTRACK_E2E_DATABASE_URL)"
+e2e: ## Playwright end-to-end tests on a fresh database (starts API and built SPA itself)
+	$(PY) scripts/ensure_db.py --recreate "$(FABTRACK_E2E_DATABASE_URL)"
 	cd $(BACKEND) && FABTRACK_DATABASE_URL="$(FABTRACK_E2E_DATABASE_URL)" .venv/bin/alembic upgrade head
 	cd $(FRONTEND) && CI=1 npx playwright test
 

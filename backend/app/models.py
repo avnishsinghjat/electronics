@@ -9,6 +9,7 @@ from app.core.files import StoredFile
 from app.core.jobs import Job
 from app.core.models import Base
 from app.core.numbering import DocumentNumberConfig, DocumentSequence
+from app.modules.auth.models import RefreshToken, User, UserRole, UserScope
 from app.modules.boq.models import Boq, BoqLine, BoqRevision
 from app.modules.inventory.models import (
     InventoryLocation,
@@ -38,6 +39,7 @@ from app.modules.production.models import (
 )
 from app.modules.qc.models import Ncr, QcInspection, QcResult, QcTemplate, QcTemplateItem
 from app.modules.reports.models import DesignEvaluation, DocumentDraft, QcReport
+from app.modules.settings.models import CompanySettings
 
 __all__ = [
     "AuditLog",
@@ -46,6 +48,7 @@ __all__ = [
     "BoqLine",
     "BoqRevision",
     "BuildLot",
+    "CompanySettings",
     "DesignEvaluation",
     "Division",
     "DocumentDraft",
@@ -72,6 +75,7 @@ __all__ = [
     "QcResult",
     "QcTemplate",
     "QcTemplateItem",
+    "RefreshToken",
     "SerialUnit",
     "StageProgress",
     "StageTemplate",
@@ -79,6 +83,9 @@ __all__ = [
     "StockBalance",
     "StockReservation",
     "StoredFile",
+    "User",
+    "UserRole",
+    "UserScope",
     "Vendor",
     "VendorReturn",
     "WorkOrder",

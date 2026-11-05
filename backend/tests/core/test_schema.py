@@ -103,5 +103,10 @@ def test_domain_model_tables_exist() -> None:
         "jobs",
         "document_number_config",
         "document_sequences",
+        "users",
+        "user_roles",
+        "user_scopes",
+        "refresh_tokens",
+        "company_settings",
     }
     assert expected == set(Base.metadata.tables)

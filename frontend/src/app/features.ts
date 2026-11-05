@@ -4,8 +4,8 @@
  * Hidden means hidden: no placeholder buttons (CLAUDE.md rule 3).
  */
 export const FEATURES = {
-  /** Phase 3: login, user menu, permissions. */
-  auth: false,
+  /** Phase 3: login, user menu, permissions. Live since the Phase 3 gate. */
+  auth: true,
   /** Phase 4: project switcher in the top bar (needs the projects API). */
   projectSwitcher: false,
   /** Phase 13: entity search (parts, POs, serials) in the command palette. */

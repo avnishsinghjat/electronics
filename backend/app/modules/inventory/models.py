@@ -98,7 +98,9 @@ class LedgerEntry(Base):
         ForeignKey("projects.id", ondelete="RESTRICT"), index=True
     )
     note: Mapped[str | None] = mapped_column(Text)
-    user_id: Mapped[uuid.UUID | None] = mapped_column(Uuid(), index=True)
+    user_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("users.id", ondelete="RESTRICT"), index=True
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=utcnow, index=True
     )

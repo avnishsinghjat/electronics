@@ -1,5 +1,10 @@
-import { AlertTriangle, Compass } from "lucide-react";
-import { Link, isRouteErrorResponse, useRouteError } from "react-router-dom";
+import type * as React from "react";
+import { AlertTriangle, Compass, ShieldX } from "lucide-react";
+import { Link, Navigate, isRouteErrorResponse, useRouteError } from "react-router-dom";
+
+import { useAuth } from "@/features/auth/AuthContext";
+
+import { visibleNavItems } from "./navigation";
 
 import { Button, Card, EmptyState } from "@/design/components";
 
@@ -53,4 +58,30 @@ export function ErrorPage({ inShell = false }: { inShell?: boolean }) {
       </Card>
     </div>
   );
+}
+
+export function ForbiddenPage() {
+  return (
+    <Card className="mx-auto mt-12 max-w-xl">
+      <EmptyState
+        icon={ShieldX}
+        title="You do not have access to this page"
+        description="Your roles do not include this section. Ask an administrator if you need it."
+        action={
+          <Button asChild variant="secondary">
+            <Link to="/">Go to your start page</Link>
+          </Button>
+        }
+      />
+    </Card>
+  );
+}
+
+/** Sends users without dashboard access (e.g. client viewers) to their first section. */
+export function HomeRoute({ dashboard }: { dashboard: React.ReactNode }) {
+  const { user } = useAuth();
+  const perms = user?.permissions ?? [];
+  if (perms.includes("dashboard:read")) return <>{dashboard}</>;
+  const first = visibleNavItems(perms)[0];
+  return <Navigate to={first ? first.to : "/forbidden"} replace />;
 }

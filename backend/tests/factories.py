@@ -171,3 +171,44 @@ async def project_tree(session: AsyncSession) -> dict[str, Any]:
     module = await create(session, ModuleFactory, project_id=project.id)
     assembly = await create(session, AssemblyFactory, module_id=module.id)
     return {"division": division, "project": project, "module": module, "assembly": assembly}
+
+
+# --- users -----------------------------------------------------------------------------
+
+DEFAULT_PASSWORD = "Factory-pass-2026"
+
+
+async def make_user(
+    session: AsyncSession,
+    username: str | None = None,
+    roles: tuple[str, ...] = ("admin",),
+    *,
+    password: str = DEFAULT_PASSWORD,
+    must_change_password: bool = False,
+    scopes: tuple[tuple[str, Any], ...] = (),
+    is_active: bool = True,
+) -> Any:
+    from app.core.security import hash_password
+    from app.modules.auth.models import User, UserRole, UserScope
+
+    user = User(
+        username=username or uniq("user").replace("-", "_"),
+        full_name="Test User",
+        password_hash=hash_password(password),
+        must_change_password=must_change_password,
+        is_active=is_active,
+    )
+    session.add(user)
+    await session.flush()
+    for role in roles:
+        session.add(UserRole(user_id=user.id, role=role))
+    for scope_type, scope_id in scopes:
+        session.add(UserScope(user_id=user.id, scope_type=scope_type, scope_id=scope_id))
+    await session.flush()
+    return user
+
+
+async def login(client: Any, username: str, password: str = DEFAULT_PASSWORD) -> dict[str, str]:
+    resp = await client.post("/api/auth/login", json={"username": username, "password": password})
+    assert resp.status_code == 200, resp.text
+    return {"Authorization": f"Bearer {resp.json()['access_token']}"}

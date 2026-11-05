@@ -89,7 +89,7 @@ class PurchaseRequisition(BusinessMixin, Base):
     number: Mapped[str] = mapped_column(String(32))
     project_id: Mapped[uuid.UUID] = fk("projects.id")
     status: Mapped[str] = status_column(PrStatus, PrStatus.DRAFT)
-    approved_by: Mapped[uuid.UUID | None]
+    approved_by: Mapped[uuid.UUID | None] = fk("users.id", nullable=True)
     approved_at: Mapped[datetime | None]
     notes: Mapped[str | None] = mapped_column(Text)
 
@@ -174,7 +174,7 @@ class GoodsReceipt(BusinessMixin, Base):
     purchase_order_id: Mapped[uuid.UUID] = fk("purchase_orders.id")
     status: Mapped[str] = status_column(GrnStatus, GrnStatus.DRAFT)
     received_at: Mapped[datetime | None]
-    received_by: Mapped[uuid.UUID | None]
+    received_by: Mapped[uuid.UUID | None] = fk("users.id", nullable=True)
     delivery_note_ref: Mapped[str | None] = mapped_column(String(100))
     notes: Mapped[str | None] = mapped_column(Text)
 

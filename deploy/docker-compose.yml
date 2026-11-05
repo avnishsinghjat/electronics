@@ -10,6 +10,8 @@ x-backend-env: &backend-env
   FABTRACK_DATA_DIR: /data
   FABTRACK_LOG_LEVEL: ${FABTRACK_LOG_LEVEL:-INFO}
   FABTRACK_AIR_GAPPED: ${FABTRACK_AIR_GAPPED:-true}
+  FABTRACK_SECRET_KEY: ${FABTRACK_SECRET_KEY:?set FABTRACK_SECRET_KEY in deploy/.env (openssl rand -hex 32)}
+  FABTRACK_COOKIE_SECURE: ${FABTRACK_COOKIE_SECURE:-false}
 
 services:
   postgres:
