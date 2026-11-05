@@ -41,7 +41,9 @@ def heartbeat_is_fresh(path: Path, max_age_s: float) -> bool:
     return state == "db_ok" and (time.time() - float(stamp)) <= max_age_s
 
 
-async def run_cycle(sessionmaker: async_sessionmaker[AsyncSession]) -> bool:
+async def run_cycle(
+    sessionmaker: async_sessionmaker[AsyncSession], settings: Settings | None = None
+) -> bool:
     """One worker cycle. Returns True when the database is reachable."""
     try:
         async with sessionmaker() as session:
@@ -51,7 +53,7 @@ async def run_cycle(sessionmaker: async_sessionmaker[AsyncSession]) -> bool:
         return False
     for _ in range(JOBS_PER_CYCLE):
         try:
-            if not await jobs.run_one(sessionmaker, WORKER_ID):
+            if not await jobs.run_one(sessionmaker, WORKER_ID, settings):
                 break
         except Exception as exc:  # a broken job must never kill the worker loop
             logger.exception("worker_job_loop_error", extra={"error": type(exc).__name__})
@@ -68,7 +70,7 @@ async def run(
     logger.info("worker_started", extra={"poll_interval_s": settings.worker_poll_interval_s})
     try:
         while not stop.is_set():
-            db_ok = await run_cycle(maker)
+            db_ok = await run_cycle(maker, settings)
             write_heartbeat(settings.worker_heartbeat_file, db_ok=db_ok)
             try:
                 await asyncio.wait_for(stop.wait(), timeout=settings.worker_poll_interval_s)
@@ -80,6 +82,9 @@ async def run(
 
 
 def main() -> None:
+    import importlib
+
+    importlib.import_module("app.handlers")
     settings = get_settings()
     configure_logging(settings.log_level, json_output=settings.log_json)
     stop = asyncio.Event()

@@ -709,6 +709,20 @@
         "title": "AuditPage",
         "type": "object"
       },
+      "Body_start_import_api_boqs__boq_id__imports_post": {
+        "properties": {
+          "file": {
+            "contentMediaType": "application/octet-stream",
+            "title": "File",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "title": "Body_start_import_api_boqs__boq_id__imports_post",
+        "type": "object"
+      },
       "Body_upload_api_files_post": {
         "properties": {
           "file": {
@@ -748,6 +762,185 @@
           "file"
         ],
         "title": "Body_upload_logo_api_settings_logo_post",
+        "type": "object"
+      },
+      "BoqCreate": {
+        "properties": {
+          "assembly_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assembly Id"
+          },
+          "build_qty": {
+            "anyOf": [
+              {
+                "maximum": 10000000.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Build Qty"
+          },
+          "create_revision": {
+            "default": true,
+            "title": "Create Revision",
+            "type": "boolean"
+          },
+          "module_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Module Id"
+          },
+          "name": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "BoqCreate",
+        "type": "object"
+      },
+      "BoqOut": {
+        "properties": {
+          "assembly_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assembly Id"
+          },
+          "assembly_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assembly Label"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "module_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Module Code"
+          },
+          "module_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Module Id"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "project_code": {
+            "title": "Project Code",
+            "type": "string"
+          },
+          "project_id": {
+            "format": "uuid",
+            "title": "Project Id",
+            "type": "string"
+          },
+          "project_name": {
+            "title": "Project Name",
+            "type": "string"
+          },
+          "revisions": {
+            "items": {
+              "$ref": "#/components/schemas/RevisionSummary"
+            },
+            "title": "Revisions",
+            "type": "array"
+          },
+          "row_version": {
+            "title": "Row Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "project_id",
+          "project_code",
+          "project_name",
+          "module_id",
+          "module_code",
+          "assembly_id",
+          "assembly_label",
+          "name",
+          "notes",
+          "row_version",
+          "revisions"
+        ],
+        "title": "BoqOut",
         "type": "object"
       },
       "BrandingOut": {
@@ -792,6 +985,58 @@
         "title": "BrandingOut",
         "type": "object"
       },
+      "BuildUpdate": {
+        "properties": {
+          "attrition_by_category": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "number"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attrition By Category"
+          },
+          "build_qty": {
+            "anyOf": [
+              {
+                "maximum": 10000000.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Build Qty"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "row_version": {
+            "title": "Row Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "row_version"
+        ],
+        "title": "BuildUpdate",
+        "type": "object"
+      },
       "ChangePasswordRequest": {
         "properties": {
           "current_password": {
@@ -812,6 +1057,37 @@
           "new_password"
         ],
         "title": "ChangePasswordRequest",
+        "type": "object"
+      },
+      "CommitIn": {
+        "properties": {
+          "build_qty": {
+            "anyOf": [
+              {
+                "maximum": 10000000.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Build Qty"
+          },
+          "release": {
+            "default": false,
+            "title": "Release",
+            "type": "boolean"
+          },
+          "row_version": {
+            "title": "Row Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "row_version"
+        ],
+        "title": "CommitIn",
         "type": "object"
       },
       "CompanyOut": {
@@ -905,6 +1181,46 @@
         "title": "CompanyUpdate",
         "type": "object"
       },
+      "CompareOut": {
+        "properties": {
+          "boq_id": {
+            "format": "uuid",
+            "title": "Boq Id",
+            "type": "string"
+          },
+          "from_revision": {
+            "title": "From Revision",
+            "type": "string"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/DiffLine"
+            },
+            "title": "Lines",
+            "type": "array"
+          },
+          "summary": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Summary",
+            "type": "object"
+          },
+          "to_revision": {
+            "title": "To Revision",
+            "type": "string"
+          }
+        },
+        "required": [
+          "boq_id",
+          "from_revision",
+          "to_revision",
+          "summary",
+          "lines"
+        ],
+        "title": "CompareOut",
+        "type": "object"
+      },
       "DataDirCheck": {
         "properties": {
           "detail": {
@@ -996,6 +1312,58 @@
           "latency_ms"
         ],
         "title": "DatabaseHealth",
+        "type": "object"
+      },
+      "DiffLine": {
+        "properties": {
+          "change": {
+            "title": "Change",
+            "type": "string"
+          },
+          "changed_fields": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Changed Fields",
+            "type": "array"
+          },
+          "from_line": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Line"
+          },
+          "line_key": {
+            "title": "Line Key",
+            "type": "string"
+          },
+          "to_line": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To Line"
+          }
+        },
+        "required": [
+          "line_key",
+          "change",
+          "from_line",
+          "to_line",
+          "changed_fields"
+        ],
+        "title": "DiffLine",
         "type": "object"
       },
       "DirectoryUser": {
@@ -1217,6 +1585,24 @@
         "title": "DivisionUpdate",
         "type": "object"
       },
+      "FieldInfo": {
+        "properties": {
+          "field": {
+            "title": "Field",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "field",
+          "label"
+        ],
+        "title": "FieldInfo",
+        "type": "object"
+      },
       "FileRef": {
         "properties": {
           "id": {
@@ -1359,6 +1745,617 @@
         "title": "HistoryEntry",
         "type": "object"
       },
+      "ImportOut": {
+        "properties": {
+          "boq_id": {
+            "format": "uuid",
+            "title": "Boq Id",
+            "type": "string"
+          },
+          "delimiter": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Delimiter"
+          },
+          "encoding": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Encoding"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "file_id": {
+            "format": "uuid",
+            "title": "File Id",
+            "type": "string"
+          },
+          "file_name": {
+            "title": "File Name",
+            "type": "string"
+          },
+          "header_row": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Header Row"
+          },
+          "headers": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Headers"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "mapping": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "integer"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mapping"
+          },
+          "preview_rows": {
+            "items": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Preview Rows",
+            "type": "array"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result"
+          },
+          "revision_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revision Id"
+          },
+          "row_version": {
+            "title": "Row Version",
+            "type": "integer"
+          },
+          "sheet": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sheet"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "suggested_template_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Suggested Template Id"
+          },
+          "total_rows": {
+            "title": "Total Rows",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "boq_id",
+          "file_id",
+          "file_name",
+          "status",
+          "encoding",
+          "delimiter",
+          "sheet",
+          "header_row",
+          "headers",
+          "preview_rows",
+          "total_rows",
+          "mapping",
+          "suggested_template_id",
+          "result",
+          "error",
+          "revision_id",
+          "row_version"
+        ],
+        "title": "ImportOut",
+        "type": "object"
+      },
+      "LineIn": {
+        "properties": {
+          "attrition_pct": {
+            "anyOf": [
+              {
+                "maximum": 100.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attrition Pct"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "maxLength": 32,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "dnp": {
+            "default": false,
+            "title": "Dnp",
+            "type": "boolean"
+          },
+          "line_key": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Line Key"
+          },
+          "manufacturer": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Manufacturer"
+          },
+          "mpn": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mpn"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "package": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Package"
+          },
+          "part_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Part Id"
+          },
+          "qty_per_unit": {
+            "anyOf": [
+              {
+                "maximum": 1000000000.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Qty Per Unit"
+          },
+          "ref_des": {
+            "anyOf": [
+              {
+                "maxLength": 10000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ref Des"
+          },
+          "unit": {
+            "default": "pcs",
+            "maxLength": 16,
+            "minLength": 1,
+            "title": "Unit",
+            "type": "string"
+          },
+          "unit_price": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit Price"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "qty_per_unit"
+        ],
+        "title": "LineIn",
+        "type": "object"
+      },
+      "LineOut": {
+        "properties": {
+          "attrition_override": {
+            "title": "Attrition Override",
+            "type": "boolean"
+          },
+          "attrition_pct": {
+            "title": "Attrition Pct",
+            "type": "string"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "dnp": {
+            "title": "Dnp",
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "issued_qty": {
+            "title": "Issued Qty",
+            "type": "string"
+          },
+          "line_key": {
+            "title": "Line Key",
+            "type": "string"
+          },
+          "line_no": {
+            "title": "Line No",
+            "type": "integer"
+          },
+          "manufacturer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Manufacturer"
+          },
+          "mpn": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mpn"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "ordered_qty": {
+            "title": "Ordered Qty",
+            "type": "string"
+          },
+          "package": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Package"
+          },
+          "part_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Part Id"
+          },
+          "pending_receipt": {
+            "title": "Pending Receipt",
+            "type": "string"
+          },
+          "preferred_vendor_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preferred Vendor Id"
+          },
+          "qty_per_unit": {
+            "title": "Qty Per Unit",
+            "type": "string"
+          },
+          "received_qty": {
+            "title": "Received Qty",
+            "type": "string"
+          },
+          "ref_des": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ref Des"
+          },
+          "required_qty": {
+            "title": "Required Qty",
+            "type": "string"
+          },
+          "shortfall": {
+            "title": "Shortfall",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "unit": {
+            "title": "Unit",
+            "type": "string"
+          },
+          "unit_price": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit Price"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "id",
+          "line_key",
+          "line_no",
+          "part_id",
+          "ref_des",
+          "qty_per_unit",
+          "mpn",
+          "manufacturer",
+          "description",
+          "value",
+          "package",
+          "category",
+          "unit",
+          "dnp",
+          "attrition_pct",
+          "attrition_override",
+          "unit_price",
+          "preferred_vendor_id",
+          "notes",
+          "required_qty",
+          "ordered_qty",
+          "received_qty",
+          "issued_qty",
+          "shortfall",
+          "pending_receipt",
+          "status"
+        ],
+        "title": "LineOut",
+        "type": "object"
+      },
+      "LinesSave": {
+        "properties": {
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/LineIn"
+            },
+            "maxItems": 20000,
+            "title": "Lines",
+            "type": "array"
+          },
+          "row_version": {
+            "title": "Row Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "row_version",
+          "lines"
+        ],
+        "title": "LinesSave",
+        "type": "object"
+      },
       "LlmHealth": {
         "properties": {
           "detail": {
@@ -1416,6 +2413,63 @@
           "password"
         ],
         "title": "LoginRequest",
+        "type": "object"
+      },
+      "MappingIn": {
+        "properties": {
+          "decimal_comma": {
+            "default": false,
+            "title": "Decimal Comma",
+            "type": "boolean"
+          },
+          "header_row": {
+            "minimum": 0.0,
+            "title": "Header Row",
+            "type": "integer"
+          },
+          "mapping": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Mapping",
+            "type": "object"
+          },
+          "row_version": {
+            "title": "Row Version",
+            "type": "integer"
+          },
+          "save_template_name": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Save Template Name"
+          },
+          "template_client": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Template Client"
+          }
+        },
+        "required": [
+          "row_version",
+          "header_row",
+          "mapping"
+        ],
+        "title": "MappingIn",
         "type": "object"
       },
       "MeOut": {
@@ -1749,6 +2803,181 @@
           "prefix"
         ],
         "title": "NumberingUpdate",
+        "type": "object"
+      },
+      "PartCreate": {
+        "properties": {
+          "category": {
+            "default": "Other",
+            "maxLength": 32,
+            "title": "Category",
+            "type": "string"
+          },
+          "description": {
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Description",
+            "type": "string"
+          },
+          "manufacturer": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Manufacturer"
+          },
+          "mpn": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Mpn",
+            "type": "string"
+          },
+          "msl_level": {
+            "anyOf": [
+              {
+                "maximum": 6.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Msl Level"
+          },
+          "package": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Package"
+          },
+          "unit": {
+            "default": "pcs",
+            "maxLength": 16,
+            "title": "Unit",
+            "type": "string"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "mpn",
+          "description"
+        ],
+        "title": "PartCreate",
+        "type": "object"
+      },
+      "PartOut": {
+        "properties": {
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_sample": {
+            "title": "Is Sample",
+            "type": "boolean"
+          },
+          "manufacturer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Manufacturer"
+          },
+          "mpn": {
+            "title": "Mpn",
+            "type": "string"
+          },
+          "msl_level": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Msl Level"
+          },
+          "package": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Package"
+          },
+          "row_version": {
+            "title": "Row Version",
+            "type": "integer"
+          },
+          "unit": {
+            "title": "Unit",
+            "type": "string"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "id",
+          "mpn",
+          "manufacturer",
+          "description",
+          "package",
+          "value",
+          "category",
+          "unit",
+          "msl_level",
+          "is_sample",
+          "row_version"
+        ],
+        "title": "PartOut",
         "type": "object"
       },
       "PermissionInfo": {
@@ -2402,6 +3631,145 @@
         "title": "ResetPasswordIn",
         "type": "object"
       },
+      "RevisionOut": {
+        "properties": {
+          "attrition_by_category": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Attrition By Category",
+            "type": "object"
+          },
+          "boq_id": {
+            "format": "uuid",
+            "title": "Boq Id",
+            "type": "string"
+          },
+          "build_qty": {
+            "title": "Build Qty",
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/LineOut"
+            },
+            "title": "Lines",
+            "type": "array"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "released_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Released At"
+          },
+          "revision": {
+            "title": "Revision",
+            "type": "string"
+          },
+          "row_version": {
+            "title": "Row Version",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "boq_id",
+          "revision",
+          "status",
+          "build_qty",
+          "attrition_by_category",
+          "released_at",
+          "notes",
+          "row_version",
+          "lines"
+        ],
+        "title": "RevisionOut",
+        "type": "object"
+      },
+      "RevisionSummary": {
+        "properties": {
+          "build_qty": {
+            "title": "Build Qty",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "line_count": {
+            "title": "Line Count",
+            "type": "integer"
+          },
+          "released_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Released At"
+          },
+          "revision": {
+            "title": "Revision",
+            "type": "string"
+          },
+          "row_version": {
+            "title": "Row Version",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "revision",
+          "status",
+          "build_qty",
+          "line_count",
+          "released_at",
+          "created_at",
+          "row_version"
+        ],
+        "title": "RevisionSummary",
+        "type": "object"
+      },
       "Role": {
         "enum": [
           "admin",
@@ -2588,6 +3956,50 @@
           "is_default"
         ],
         "title": "StageTemplateOut",
+        "type": "object"
+      },
+      "TemplateOut": {
+        "properties": {
+          "client_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Name"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "mapping": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Mapping",
+            "type": "object"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "row_version": {
+            "title": "Row Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "client_name",
+          "mapping",
+          "row_version"
+        ],
+        "title": "TemplateOut",
         "type": "object"
       },
       "TokenOut": {
@@ -3419,6 +4831,862 @@
         ]
       }
     },
+    "/api/boq-import-fields": {
+      "get": {
+        "operationId": "fields_api_boq_import_fields_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/FieldInfo"
+                  },
+                  "title": "Response Fields Api Boq Import Fields Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Fields a column can map to",
+        "tags": [
+          "boq"
+        ]
+      }
+    },
+    "/api/boq-imports/{import_id}": {
+      "get": {
+        "operationId": "get_import_api_boq_imports__import_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "import_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Import Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Import status, preview and validation result",
+        "tags": [
+          "boq"
+        ]
+      }
+    },
+    "/api/boq-imports/{import_id}/commit": {
+      "post": {
+        "operationId": "commit_api_boq_imports__import_id__commit_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "import_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Import Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommitIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RevisionSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create the revision from a validated import",
+        "tags": [
+          "boq"
+        ]
+      }
+    },
+    "/api/boq-imports/{import_id}/errors.csv": {
+      "get": {
+        "operationId": "error_csv_api_boq_imports__import_id__errors_csv_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "import_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Import Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Validation report as CSV",
+        "tags": [
+          "boq"
+        ]
+      }
+    },
+    "/api/boq-imports/{import_id}/mapping": {
+      "put": {
+        "description": "Validation runs as a background job; poll until `status` is `validated`.",
+        "operationId": "set_mapping_api_boq_imports__import_id__mapping_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "import_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Import Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MappingIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set the column mapping and validate",
+        "tags": [
+          "boq"
+        ]
+      }
+    },
+    "/api/boq-imports/{import_id}/template/{template_id}": {
+      "get": {
+        "operationId": "apply_template_api_boq_imports__import_id__template__template_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "import_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Import Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "template_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Template Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "integer"
+                  },
+                  "title": "Response Apply Template Api Boq Imports  Import Id  Template  Template Id  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Mapping from a saved template",
+        "tags": [
+          "boq"
+        ]
+      }
+    },
+    "/api/boq-mapping-templates": {
+      "get": {
+        "operationId": "templates_api_boq_mapping_templates_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TemplateOut"
+                  },
+                  "title": "Response Templates Api Boq Mapping Templates Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Saved column mappings",
+        "tags": [
+          "boq"
+        ]
+      }
+    },
+    "/api/boq-mapping-templates/{template_id}": {
+      "delete": {
+        "operationId": "delete_template_api_boq_mapping_templates__template_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "template_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Template Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "row_version",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "title": "Row Version",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete a saved mapping",
+        "tags": [
+          "boq"
+        ]
+      }
+    },
+    "/api/boq-revisions/{revision_id}": {
+      "delete": {
+        "operationId": "delete_revision_api_boq_revisions__revision_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "revision_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Revision Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "row_version",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "title": "Row Version",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete a draft revision",
+        "tags": [
+          "boq"
+        ]
+      },
+      "get": {
+        "operationId": "get_revision_api_boq_revisions__revision_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "revision_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Revision Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RevisionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Revision with lines and status",
+        "tags": [
+          "boq"
+        ]
+      },
+      "patch": {
+        "operationId": "update_build_api_boq_revisions__revision_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "revision_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Revision Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BuildUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RevisionSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Build quantity, attrition by category, notes",
+        "tags": [
+          "boq"
+        ]
+      }
+    },
+    "/api/boq-revisions/{revision_id}/lines": {
+      "put": {
+        "operationId": "save_lines_api_boq_revisions__revision_id__lines_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "revision_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Revision Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LinesSave"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RevisionSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Save the draft's lines (grid)",
+        "tags": [
+          "boq"
+        ]
+      }
+    },
+    "/api/boq-revisions/{revision_id}/release": {
+      "post": {
+        "operationId": "release_api_boq_revisions__revision_id__release_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "revision_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Revision Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VersionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RevisionSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Release a draft revision",
+        "tags": [
+          "boq"
+        ]
+      }
+    },
+    "/api/boqs": {
+      "get": {
+        "operationId": "list_all_api_boqs_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/BoqOut"
+                  },
+                  "title": "Response List All Api Boqs Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "All BOQs in scope",
+        "tags": [
+          "boq"
+        ]
+      }
+    },
+    "/api/boqs/{boq_id}": {
+      "delete": {
+        "operationId": "delete_api_boqs__boq_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "boq_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Boq Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "row_version",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "title": "Row Version",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete a BOQ that was never released",
+        "tags": [
+          "boq"
+        ]
+      },
+      "get": {
+        "operationId": "get_api_boqs__boq_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "boq_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Boq Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoqOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get a BOQ and its revisions",
+        "tags": [
+          "boq"
+        ]
+      }
+    },
+    "/api/boqs/{boq_id}/compare": {
+      "get": {
+        "operationId": "compare_api_boqs__boq_id__compare_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "boq_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Boq Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "schema": {
+              "maxLength": 8,
+              "title": "From",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": true,
+            "schema": {
+              "maxLength": 8,
+              "title": "To",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompareOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Compare two revisions",
+        "tags": [
+          "boq"
+        ]
+      }
+    },
+    "/api/boqs/{boq_id}/imports": {
+      "post": {
+        "description": "Parsing runs as a background job; poll the import until `status` is `parsed`.",
+        "operationId": "start_import_api_boqs__boq_id__imports_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "boq_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Boq Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_start_import_api_boqs__boq_id__imports_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Upload a BOQ file (CSV/XLSX)",
+        "tags": [
+          "boq"
+        ]
+      }
+    },
+    "/api/boqs/{boq_id}/revisions": {
+      "post": {
+        "description": "Copies the current (released, else latest) revision into a new draft.",
+        "operationId": "new_revision_api_boqs__boq_id__revisions_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "boq_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Boq Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RevisionSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Start a new revision",
+        "tags": [
+          "boq"
+        ]
+      }
+    },
     "/api/directory/users": {
       "get": {
         "operationId": "directory_api_directory_users_get",
@@ -4059,6 +6327,105 @@
         ]
       }
     },
+    "/api/parts": {
+      "get": {
+        "operationId": "search_api_parts_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "default": "",
+              "maxLength": 100,
+              "title": "Q",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PartOut"
+                  },
+                  "title": "Response Search Api Parts Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Search the part master (MPN autocomplete)",
+        "tags": [
+          "parts"
+        ]
+      },
+      "post": {
+        "operationId": "create_api_parts_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PartCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create a part",
+        "tags": [
+          "parts"
+        ]
+      }
+    },
     "/api/projects": {
       "get": {
         "operationId": "list_projects_api_projects_get",
@@ -4439,6 +6806,105 @@
         "summary": "Edit a project",
         "tags": [
           "org"
+        ]
+      }
+    },
+    "/api/projects/{project_id}/boqs": {
+      "get": {
+        "operationId": "list_for_project_api_projects__project_id__boqs_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/BoqOut"
+                  },
+                  "title": "Response List For Project Api Projects  Project Id  Boqs Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "BOQs of a project",
+        "tags": [
+          "boq"
+        ]
+      },
+      "post": {
+        "description": "Starts with an empty draft revision A unless `create_revision` is false (import first).",
+        "operationId": "create_api_projects__project_id__boqs_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BoqCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoqOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create a BOQ",
+        "tags": [
+          "boq"
         ]
       }
     },

@@ -1,0 +1,16 @@
+line_no,ref_des,qty_per_unit,mpn,manufacturer,description,value,package,category,unit,dnp,preferred_vendor,unit_price_inr,notes
+1,"C1,C2,C5",3,GRM188R71H104KA93D,Murata,Cap MLCC 100nF 50V X7R,100nF,0603,Passive,pcs,N,,1.20,
+2,"C3,C4",2,GRM21BR61E106KA73L,Murata,Cap MLCC 10uF 25V X5R,10uF,0805,Passive,pcs,N,,4.50,
+3,"C6-C9",4,GRM1885C1H220JA01D,Murata,Cap MLCC 22pF 50V C0G,22pF,0603,Passive,pcs,N,,0.90,Crystal load caps
+4,"R1,R2",2,RC0603FR-0710KL,Yageo,Res 10k 1% 0.1W,10k,0603,Passive,pcs,N,,0.40,
+5,R3,1,RC0603FR-071KL,Yageo,Res 1k 1% 0.1W,1k,0603,Passive,pcs,N,,0.40,
+6,"R4,R5",2,RC0603FR-0722RL,Yageo,Res 22R 1% 0.1W,22R,0603,Passive,pcs,N,,0.40,USB series
+7,FB1,1,BLM18PG221SN1D,Murata,Ferrite bead 220R,220R,0603,Passive,pcs,N,,2.10,
+8,U1,1,STM32F407VGT6,STMicroelectronics,MCU ARM Cortex-M4,,LQFP-100,IC,pcs,N,,780.00,MSL3
+9,U2,1,AMS1117-3.3,Advanced Monolithic Systems,LDO 3.3V 1A,,SOT-223,IC,pcs,N,,12.00,
+10,U3,1,USBLC6-2SC6,STMicroelectronics,USB ESD protection,,SOT-23-6,IC,pcs,N,,18.50,
+11,Y1,1,ABM8-8.000MHZ-B2-T,Abracon,Crystal 8MHz 18pF,8MHz,3.2x2.5mm,Crystal,pcs,N,,32.00,
+12,"D1,D2",2,LTST-C191KGKT,Lite-On,LED green 0603,,0603,Opto,pcs,N,,3.00,
+13,J2,1,10118194-0001LF,Amphenol,Micro USB-B receptacle,,SMD,Connector,pcs,N,,24.00,
+14,SW1,1,TS-1187A-B-A-B,XKB,Tactile switch,,SMD,Electromechanical,pcs,N,,3.50,
+15,J1,1,,,Header 2x5 2.54mm,,THT,Connector,pcs,Y,,,Do not populate

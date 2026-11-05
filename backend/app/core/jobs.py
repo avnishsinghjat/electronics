@@ -21,6 +21,7 @@ from sqlalchemy import DateTime, ForeignKey, Index, Integer, String, Text, or_, 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from sqlalchemy.orm import Mapped, mapped_column
 
+from app.core.config import Settings, get_settings
 from app.core.context import acting_as
 from app.core.errors import AppError
 from app.core.ids import uuid7
@@ -69,6 +70,7 @@ class JobContext:
     payload: dict[str, Any]
     session: AsyncSession
     attempt: int
+    settings: Settings
 
 
 Handler = Callable[[JobContext], Awaitable[dict[str, Any] | None]]
@@ -136,7 +138,11 @@ async def claim_next(
     return job
 
 
-async def run_one(sessionmaker: async_sessionmaker[AsyncSession], worker_id: str) -> bool:
+async def run_one(
+    sessionmaker: async_sessionmaker[AsyncSession],
+    worker_id: str,
+    settings: Settings | None = None,
+) -> bool:
     """Claim and execute one job. Returns False when the queue is empty."""
     async with sessionmaker() as session:
         job = await claim_next(session, worker_id)
@@ -151,7 +157,9 @@ async def run_one(sessionmaker: async_sessionmaker[AsyncSession], worker_id: str
             if handler is None:
                 raise AppError(f"No handler registered for job kind {kind!r}")
             with acting_as(created_by):
-                result = await handler(JobContext(job_id, payload, session, attempt))
+                result = await handler(
+                    JobContext(job_id, payload, session, attempt, settings or get_settings())
+                )
             await session.commit()
         except Exception as exc:
             await session.rollback()

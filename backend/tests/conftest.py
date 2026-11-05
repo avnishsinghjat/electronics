@@ -141,3 +141,23 @@ async def client(app: FastAPI) -> AsyncIterator[AsyncClient]:
     transport = ASGITransport(app=app, raise_app_exceptions=False)
     async with AsyncClient(transport=transport, base_url="http://testserver") as c:
         yield c
+
+
+@pytest_asyncio.fixture(loop_scope="session")
+async def run_jobs(db_conn: AsyncConnection, settings: Settings):
+    """Drain queued background jobs on the test connection (the worker equivalent)."""
+    from sqlalchemy.ext.asyncio import async_sessionmaker
+
+    from app.core import jobs
+
+    maker = async_sessionmaker(
+        bind=db_conn, join_transaction_mode="create_savepoint", expire_on_commit=False
+    )
+
+    async def drain() -> int:
+        count = 0
+        while await jobs.run_one(maker, "test-worker", settings):
+            count += 1
+        return count
+
+    return drain

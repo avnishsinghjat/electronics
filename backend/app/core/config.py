@@ -29,6 +29,9 @@ class Settings(BaseSettings):
     db_connect_timeout_s: float = Field(default=5.0, gt=0)
     worker_heartbeat_file: Path = Path("./var/worker.heartbeat")
     worker_poll_interval_s: float = Field(default=2.0, gt=0)
+    # Run the job worker inside the API process (single-process installs, dev, e2e).
+    # Production compose runs the separate worker service instead.
+    run_jobs_in_api: bool = False
 
     # Authentication. The secret signs access tokens; set a long random value in production.
     secret_key: str = DEV_SECRET

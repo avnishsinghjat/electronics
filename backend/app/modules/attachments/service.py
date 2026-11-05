@@ -190,7 +190,17 @@ async def _assembly(session: AsyncSession, user: Principal, ref_id: uuid.UUID) -
     await org.get_assembly(session, user, ref_id)
 
 
+async def _boq(session: AsyncSession, user: Principal, ref_id: uuid.UUID) -> None:
+    from app.modules.boq.models import Boq  # BOQ files: uploaded BOQ sources
+
+    boq = await session.get(Boq, ref_id)
+    if boq is None or boq.is_deleted:
+        raise NotFoundError("BOQ not found")
+    await org.get_project(session, user, boq.project_id)
+
+
 register_ref_type("division", _division)
+register_ref_type("boq", _boq)
 register_ref_type("project", _project)
 register_ref_type("module", _module)
 register_ref_type("assembly", _assembly)

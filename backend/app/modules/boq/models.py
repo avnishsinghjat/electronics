@@ -4,11 +4,12 @@ import enum
 import uuid
 from datetime import datetime
 from decimal import Decimal
+from typing import Any
 
 from sqlalchemy import Boolean, CheckConstraint, Index, Integer, Numeric, String, Text, text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.core.models import Base, BusinessMixin, Money, Qty, enum_check, fk, status_column
+from app.core.models import Base, BusinessMixin, JsonB, Money, Qty, enum_check, fk, status_column
 
 _LIVE = text("is_deleted = false")
 
@@ -61,6 +62,8 @@ class BoqRevision(BusinessMixin, Base):
     source_file_id: Mapped[uuid.UUID | None] = fk("files.id", nullable=True)
     released_at: Mapped[datetime | None]
     notes: Mapped[str | None] = mapped_column(Text)
+    # Attrition % per part category for this revision (e.g. {"Passive": 2, "IC": 0}).
+    attrition_by_category: Mapped[dict[str, Any]] = mapped_column(JsonB, default=dict)
 
 
 class BoqLine(BusinessMixin, Base):
@@ -90,6 +93,55 @@ class BoqLine(BusinessMixin, Base):
     unit: Mapped[str] = mapped_column(String(16), default="pcs")
     dnp: Mapped[bool] = mapped_column(Boolean, default=False)
     attrition_pct: Mapped[Decimal] = mapped_column(Numeric(5, 2), default=Decimal(0))
+    # True when attrition was set on this line; otherwise it follows the category rate.
+    attrition_override: Mapped[bool] = mapped_column(Boolean, default=False)
     unit_price: Mapped[Decimal | None] = mapped_column(Money)
     preferred_vendor_id: Mapped[uuid.UUID | None] = fk("vendors.id", nullable=True)
     notes: Mapped[str | None] = mapped_column(Text)
+
+
+class ImportStatus(enum.StrEnum):
+    UPLOADED = "uploaded"
+    PARSING = "parsing"
+    PARSED = "parsed"
+    VALIDATING = "validating"
+    VALIDATED = "validated"
+    COMMITTED = "committed"
+    FAILED = "failed"
+
+
+class BoqImport(BusinessMixin, Base):
+    """One run of the import wizard. Holds the parsed table and validation result until the
+    user commits; nothing is written to BOQ revisions before commit."""
+
+    __tablename__ = "boq_imports"
+    __table_args__ = (enum_check("status", ImportStatus),)
+
+    boq_id: Mapped[uuid.UUID] = fk("boqs.id")
+    file_id: Mapped[uuid.UUID] = fk("files.id")
+    status: Mapped[str] = status_column(ImportStatus, ImportStatus.UPLOADED)
+    encoding: Mapped[str | None] = mapped_column(String(32))
+    delimiter: Mapped[str | None] = mapped_column(String(4))
+    sheet: Mapped[str | None] = mapped_column(String(64))
+    header_row: Mapped[int | None] = mapped_column(Integer)
+    headers: Mapped[list[str] | None] = mapped_column(JsonB)
+    rows: Mapped[list[list[str]] | None] = mapped_column(JsonB)
+    mapping: Mapped[dict[str, int] | None] = mapped_column(JsonB)
+    template_id: Mapped[uuid.UUID | None] = fk("boq_mapping_templates.id", nullable=True)
+    result: Mapped[dict[str, Any] | None] = mapped_column(JsonB)
+    error: Mapped[str | None] = mapped_column(Text)
+    job_id: Mapped[uuid.UUID | None] = fk("jobs.id", nullable=True)
+    revision_id: Mapped[uuid.UUID | None] = fk("boq_revisions.id", nullable=True)
+
+
+class BoqMappingTemplate(BusinessMixin, Base):
+    """Saved column mapping (field -> normalised header text), typically one per client."""
+
+    __tablename__ = "boq_mapping_templates"
+    __table_args__ = (
+        Index("uq_boq_mapping_templates_name_live", "name", unique=True, postgresql_where=_LIVE),
+    )
+
+    name: Mapped[str] = mapped_column(String(120))
+    client_name: Mapped[str | None] = mapped_column(String(200), index=True)
+    mapping: Mapped[dict[str, str]] = mapped_column(JsonB)

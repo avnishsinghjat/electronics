@@ -108,5 +108,7 @@ def test_domain_model_tables_exist() -> None:
         "user_scopes",
         "refresh_tokens",
         "company_settings",
+        "boq_imports",
+        "boq_mapping_templates",
     }
     assert expected == set(Base.metadata.tables)

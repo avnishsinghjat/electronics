@@ -1,10 +1,27 @@
 import uuid
 from datetime import datetime
+from typing import Any
 
 from sqlalchemy import Boolean, CheckConstraint, DateTime, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.core.models import Base, BusinessMixin, fk
+from app.core.models import Base, BusinessMixin, JsonB, fk
+
+# Default attrition % by part category; copied onto each new BOQ revision, editable there.
+DEFAULT_ATTRITION: dict[str, float] = {
+    "Passive": 2,
+    "IC": 0,
+    "Discrete": 1,
+    "Connector": 0,
+    "Electromechanical": 0,
+    "Magnetics": 0,
+    "Opto": 1,
+    "Crystal": 0,
+    "Mechanical": 0,
+    "PCB": 0,
+    "Consumable": 5,
+    "Other": 0,
+}
 
 
 class CompanySettings(BusinessMixin, Base):
@@ -20,3 +37,6 @@ class CompanySettings(BusinessMixin, Base):
     logo_file_id: Mapped[uuid.UUID | None] = fk("files.id", nullable=True)
     setup_completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     store_llm_transcripts: Mapped[bool] = mapped_column(Boolean, default=False)
+    attrition_defaults: Mapped[dict[str, Any]] = mapped_column(
+        JsonB, default=lambda: dict(DEFAULT_ATTRITION)
+    )

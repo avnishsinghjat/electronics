@@ -10,7 +10,7 @@ from app.core.jobs import Job
 from app.core.models import Base
 from app.core.numbering import DocumentNumberConfig, DocumentSequence
 from app.modules.auth.models import RefreshToken, User, UserRole, UserScope
-from app.modules.boq.models import Boq, BoqLine, BoqRevision
+from app.modules.boq.models import Boq, BoqImport, BoqLine, BoqMappingTemplate, BoqRevision
 from app.modules.inventory.models import (
     InventoryLocation,
     LedgerEntry,
@@ -45,7 +45,9 @@ __all__ = [
     "AuditLog",
     "Base",
     "Boq",
+    "BoqImport",
     "BoqLine",
+    "BoqMappingTemplate",
     "BoqRevision",
     "BuildLot",
     "CompanySettings",
