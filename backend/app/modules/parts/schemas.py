@@ -15,6 +15,7 @@ class PartOut(BaseModel):
     category: str
     unit: str
     msl_level: int | None
+    min_stock: int | None
     is_sample: bool
     row_version: int
 
@@ -27,4 +28,10 @@ class PartCreate(BaseModel):
     value: str | None = Field(default=None, max_length=64)
     category: str = Field(default="Other", max_length=32)
     unit: str = Field(default="pcs", max_length=16)
+    msl_level: int | None = Field(default=None, ge=1, le=6)
+
+
+class PartStockSettings(BaseModel):
+    row_version: int
+    min_stock: int | None = Field(default=None, ge=0, le=100_000_000)
     msl_level: int | None = Field(default=None, ge=1, le=6)

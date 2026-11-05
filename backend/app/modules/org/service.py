@@ -6,6 +6,7 @@ other projects exist. Every write checks the permission here as well as in the r
 """
 
 import uuid
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import date
 from typing import Any
@@ -812,3 +813,24 @@ async def directory(session: AsyncSession, user: Principal) -> list[dict[str, An
         }
         for u in users
     ]
+
+
+async def scoped_project_ids(session: AsyncSession, user: Principal) -> set[uuid.UUID] | None:
+    """Ids of the projects a scoped user may see; None when the user is unrestricted."""
+    if user.unrestricted:
+        return None
+    rows = await session.execute(scope_projects(select(Project.id), user))
+    return set(rows.scalars().all())
+
+
+async def project_labels(
+    session: AsyncSession, ids: Iterable[uuid.UUID]
+) -> dict[uuid.UUID, tuple[str, str]]:
+    """Project id -> (code, name), for listings of other modules."""
+    wanted = set(ids)
+    if not wanted:
+        return {}
+    rows = await session.execute(
+        select(Project.id, Project.code, Project.name).where(Project.id.in_(wanted))
+    )
+    return {pid: (code, name) for pid, code, name in rows.all()}

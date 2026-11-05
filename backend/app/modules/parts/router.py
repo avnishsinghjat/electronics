@@ -1,3 +1,4 @@
+import uuid
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
@@ -7,7 +8,7 @@ from app.core.db import get_session
 from app.modules.auth.deps import require
 from app.modules.auth.service import Principal
 from app.modules.parts import service
-from app.modules.parts.schemas import PartCreate, PartOut
+from app.modules.parts.schemas import PartCreate, PartOut, PartStockSettings
 
 router = APIRouter(prefix="/parts", tags=["parts"])
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
@@ -30,3 +31,13 @@ async def create(
     session: SessionDep,
 ) -> PartOut:
     return PartOut.model_validate(await service.create(session, user, body))
+
+
+@router.patch("/{part_id}", response_model=PartOut, summary="Set minimum stock and MSL level")
+async def update_stock_settings(
+    part_id: uuid.UUID,
+    body: PartStockSettings,
+    user: Annotated[Principal, Depends(require("parts:manage"))],
+    session: SessionDep,
+) -> PartOut:
+    return PartOut.model_validate(await service.update_stock_settings(session, user, part_id, body))

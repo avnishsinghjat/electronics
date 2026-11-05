@@ -10,6 +10,11 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /srv/fabtrack
 
+# WeasyPrint (PDF generation) needs Pango; fonts are bundled with the app, not downloaded.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0 \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY pyproject.toml requirements.lock ./
 COPY app ./app
 RUN --mount=type=secret,id=extra_ca \

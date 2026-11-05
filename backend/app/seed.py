@@ -771,3 +771,121 @@ async def seed_sample_boqs(session: AsyncSession) -> int:
     session.add_all(new)
     await session.flush()
     return 3 + len(new)
+
+
+async def seed_sample_procurement(session: AsyncSession) -> int:
+    """Two purchase orders against the sample BOQ's released revision, one partly received,
+    so the tracker shows every state on a fresh install: received, partially received,
+    ordered (one line overdue) and not ordered. Dates are relative to today."""
+    from datetime import timedelta
+
+    from app.modules.procurement import service as procurement
+    from app.modules.procurement.models import PoLine, PoLineAllocation, PurchaseOrder
+    from app.modules.procurement.schemas import GrnCreate, GrnLineIn
+
+    if await _exists(session, PurchaseOrder, notes=SAMPLE_NOTE):
+        return 0
+    boq = (
+        await session.execute(
+            select(Boq).where(Boq.name == SAMPLE_BOQ_NAME, Boq.is_deleted.is_(False))
+        )
+    ).scalar_one_or_none()
+    if boq is None:
+        return 0
+    rev_a = (
+        await session.execute(
+            select(BoqRevision).where(BoqRevision.boq_id == boq.id, BoqRevision.revision == "A")
+        )
+    ).scalar_one()
+    lines = {
+        ln.mpn: ln
+        for ln in (
+            await session.execute(select(BoqLine).where(BoqLine.revision_id == rev_a.id))
+        ).scalars()
+    }
+    vendors = (
+        (
+            await session.execute(
+                select(Vendor).where(Vendor.is_sample.is_(True)).order_by(Vendor.code)
+            )
+        )
+        .scalars()
+        .all()
+    )
+    store = (
+        await session.execute(select(InventoryLocation).where(InventoryLocation.code == "STORES"))
+    ).scalar_one()
+    today = date.today()
+    # (vendor index, issued days ago, [(MPN, qty, unit price, expected in days)])
+    orders: list[tuple[int, int, list[tuple[str, int, str, int]]]] = [
+        (
+            0,
+            20,
+            [
+                ("GRM188R71H104KA93D", 204, "0.80", -8),
+                ("GRM21BR61E106KA73L", 51, "4.50", -8),
+                ("GRM1885C1H220JA01D", 51, "0.60", -5),
+                ("RC0603FR-0710KL", 153, "0.20", -8),
+            ],
+        ),
+        (1, 6, [("STM32F407VGT6", 25, "780.00", 10), ("AMS1117-3.3", 25, "18.00", 10)]),
+    ]
+    created = 0
+    po_records = []
+    for vendor_idx, days_ago, specs in orders:
+        po = PurchaseOrder(
+            number=await next_number(session, "PO"),
+            vendor_id=vendors[vendor_idx].id,
+            status="issued",
+            order_date=today - timedelta(days=days_ago),
+            issued_at=utcnow() - timedelta(days=days_ago),
+            notes=SAMPLE_NOTE,
+        )
+        session.add(po)
+        await session.flush()
+        for no, (mpn, qty, price, due) in enumerate(specs, start=1):
+            bl = lines[mpn]
+            pl = PoLine(
+                purchase_order_id=po.id,
+                line_no=no,
+                part_id=bl.part_id,
+                qty_ordered=Decimal(qty),
+                unit_price=Decimal(price),
+                expected_date=today + timedelta(days=due),
+            )
+            session.add(pl)
+            await session.flush()
+            session.add(
+                PoLineAllocation(
+                    po_line_id=pl.id, boq_line_id=bl.id, project_id=boq.project_id, qty=Decimal(qty)
+                )
+            )
+            created += 2
+        po_records.append(po)
+    await session.flush()
+    # Delivery against the first order: two lines in full, the 10k resistors in part.
+    first = po_records[0]
+    po_lines = {pl.line_no: pl for pl in await procurement.po_lines(session, first.id)}
+    receipt = [(1, 204, "MUR-2644-A"), (2, 51, "MUR-2640-C"), (4, 100, "YAG-2646")]
+    await procurement.post_receipt(
+        session,
+        first,
+        GrnCreate(
+            purchase_order_id=first.id,
+            delivery_note_ref="DN/SAMPLE/0412",
+            notes=SAMPLE_NOTE,
+            lines=[
+                GrnLineIn(
+                    po_line_id=po_lines[no].id,
+                    location_id=store.id,
+                    qty_received=Decimal(qty),
+                    qty_accepted=Decimal(qty),
+                    batch_lot=lot,
+                )
+                for no, qty, lot in receipt
+            ],
+        ),
+        received_by=None,
+    )
+    await session.flush()
+    return created + 1 + len(receipt)

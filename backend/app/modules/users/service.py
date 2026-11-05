@@ -2,6 +2,7 @@
 every function re-checks the permission (service-layer enforcement)."""
 
 import uuid
+from collections.abc import Iterable
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -223,3 +224,14 @@ async def set_active(
     user.is_active = active
     await session.commit()
     return user
+
+
+async def display_names(
+    session: AsyncSession, ids: Iterable[uuid.UUID | None]
+) -> dict[uuid.UUID, str]:
+    """User id -> full name, for "created by" / "approved by" columns of other modules."""
+    wanted = {i for i in ids if i is not None}
+    if not wanted:
+        return {}
+    rows = await session.execute(select(User.id, User.full_name).where(User.id.in_(wanted)))
+    return {uid: name for uid, name in rows.all()}

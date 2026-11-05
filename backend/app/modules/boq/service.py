@@ -41,7 +41,7 @@ from app.modules.boq.status import LineQuantities, quantities, required_qty
 from app.modules.org import service as org
 from app.modules.org.models import Module, PcbAssembly, Project
 from app.modules.parts import service as parts
-from app.modules.procurement import service as procurement
+from app.modules.procurement import quantities as procurement
 from app.modules.settings.models import DEFAULT_ATTRITION, CompanySettings
 
 _LINE_FIELDS = (
@@ -176,6 +176,30 @@ async def current_revision(session: AsyncSession, boq_id: uuid.UUID) -> BoqRevis
 # ---------------------------------------------------------------- reading
 
 
+async def key_groups(
+    session: AsyncSession, boq_id: uuid.UUID, lines: list[BoqLine]
+) -> dict[uuid.UUID, list[uuid.UUID]]:
+    """Line id -> ids of the lines with the same line key in every revision of the BOQ, so
+    purchase orders and issues against an earlier revision keep counting."""
+    keys = {ln.line_key for ln in lines}
+    rows = (
+        await session.execute(
+            select(BoqLine.line_key, BoqLine.id)
+            .join(BoqRevision, BoqRevision.id == BoqLine.revision_id)
+            .where(
+                BoqRevision.boq_id == boq_id,
+                BoqRevision.is_deleted.is_(False),
+                BoqLine.is_deleted.is_(False),
+                BoqLine.line_key.in_(keys),
+            )
+        )
+    ).all()
+    by_key: dict[str, list[uuid.UUID]] = {}
+    for key, line_id in rows:
+        by_key.setdefault(key, []).append(line_id)
+    return {ln.id: by_key.get(ln.line_key, [ln.id]) for ln in lines}
+
+
 @dataclass
 class BoqView:
     boq: Boq
@@ -243,7 +267,7 @@ async def revision_lines(
 ) -> tuple[BoqRevision, list[tuple[BoqLine, LineQuantities]]]:
     _, rev = await _revision(session, user, revision_id)
     lines = await _lines(session, rev.id)
-    qty = await procurement.line_quantities(session, [ln.id for ln in lines])
+    qty = await procurement.line_quantities(session, await key_groups(session, rev.boq_id, lines))
     out = []
     for ln in lines:
         req = required_qty(
@@ -252,6 +276,116 @@ async def revision_lines(
         ordered, received, issued = qty.get(ln.id, (Decimal(0), Decimal(0), Decimal(0)))
         out.append((ln, quantities(req, ordered, received, issued)))
     return rev, out
+
+
+# ---------------------------------------------------------------- for procurement
+
+
+@dataclass
+class TrackedLine:
+    line: BoqLine
+    qty: LineQuantities
+    group: list[uuid.UUID]  # this line's id plus the same line key in other revisions
+
+
+@dataclass
+class TrackedBoq:
+    view: BoqView
+    revision: BoqRevision | None
+    lines: list[TrackedLine]
+
+
+async def project_lines(
+    session: AsyncSession, user: Principal, project_id: uuid.UUID
+) -> list[TrackedBoq]:
+    """Each BOQ of the project with its current revision (released, else the latest) and
+    every line's quantities from the status service."""
+    out = []
+    for view in await list_project_boqs(session, user, project_id):
+        rev = await current_revision(session, view.boq.id)
+        if rev is None:
+            out.append(TrackedBoq(view, None, []))
+            continue
+        lines = await _lines(session, rev.id)
+        groups = await key_groups(session, view.boq.id, lines)
+        qty = await procurement.line_quantities(session, groups)
+        tracked = []
+        for ln in lines:
+            req = required_qty(
+                ln.qty_per_unit, rev.build_qty, ln.attrition_pct, unit=ln.unit, dnp=ln.dnp
+            )
+            ordered, received, issued = qty.get(ln.id, (Decimal(0), Decimal(0), Decimal(0)))
+            tracked.append(
+                TrackedLine(ln, quantities(req, ordered, received, issued), groups[ln.id])
+            )
+        out.append(TrackedBoq(view, rev, tracked))
+    return out
+
+
+@dataclass(frozen=True)
+class LineRef:
+    id: uuid.UUID
+    boq_id: uuid.UUID
+    boq_name: str
+    project_id: uuid.UUID
+    revision: str
+    revision_status: str
+    line_no: int
+    part_id: uuid.UUID | None
+    mpn: str | None
+    description: str | None
+    ref_des: str | None
+    unit: str
+
+
+async def line_refs(
+    session: AsyncSession, user: Principal, line_ids: list[uuid.UUID]
+) -> dict[uuid.UUID, LineRef]:
+    """BOQ lines by id with their BOQ and project. Raises NotFoundError for a missing line
+    or one outside the user's scope."""
+    if not line_ids:
+        return {}
+    rows = (
+        await session.execute(
+            select(BoqLine, BoqRevision, Boq)
+            .join(BoqRevision, BoqRevision.id == BoqLine.revision_id)
+            .join(Boq, Boq.id == BoqRevision.boq_id)
+            .where(
+                BoqLine.id.in_(set(line_ids)),
+                BoqLine.is_deleted.is_(False),
+                BoqRevision.is_deleted.is_(False),
+                Boq.is_deleted.is_(False),
+            )
+        )
+    ).all()
+    found = {ln.id: (ln, rev, boq) for ln, rev, boq in rows}
+    out: dict[uuid.UUID, LineRef] = {}
+    checked: set[uuid.UUID] = set()
+    for line_id in line_ids:
+        if line_id not in found:
+            raise NotFoundError("BOQ line not found", details={"id": str(line_id)})
+        ln, rev, boq = found[line_id]
+        if boq.project_id not in checked:
+            try:
+                await org.get_project(session, user, boq.project_id)
+            except NotFoundError as exc:
+                raise NotFoundError("BOQ line not found", details={"id": str(line_id)}) from exc
+            checked.add(boq.project_id)
+        out[line_id] = LineRef(
+            id=ln.id,
+            boq_id=boq.id,
+            boq_name=boq.name,
+            project_id=boq.project_id,
+            revision=rev.revision,
+            revision_status=rev.status,
+            line_no=ln.line_no,
+            part_id=ln.part_id,
+            mpn=ln.mpn,
+            description=ln.description,
+            ref_des=ln.ref_des,
+            unit=ln.unit,
+        )
+    return out
 
 
 # ---------------------------------------------------------------- BOQ and revisions

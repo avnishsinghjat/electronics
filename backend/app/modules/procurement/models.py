@@ -89,8 +89,10 @@ class PurchaseRequisition(BusinessMixin, Base):
     number: Mapped[str] = mapped_column(String(32))
     project_id: Mapped[uuid.UUID] = fk("projects.id")
     status: Mapped[str] = status_column(PrStatus, PrStatus.DRAFT)
+    submitted_at: Mapped[datetime | None]
     approved_by: Mapped[uuid.UUID | None] = fk("users.id", nullable=True)
     approved_at: Mapped[datetime | None]
+    decision_note: Mapped[str | None] = mapped_column(Text)
     notes: Mapped[str | None] = mapped_column(Text)
 
 
@@ -176,6 +178,7 @@ class GoodsReceipt(BusinessMixin, Base):
     received_at: Mapped[datetime | None]
     received_by: Mapped[uuid.UUID | None] = fk("users.id", nullable=True)
     delivery_note_ref: Mapped[str | None] = mapped_column(String(100))
+    coc_file_id: Mapped[uuid.UUID | None] = fk("files.id", nullable=True)
     notes: Mapped[str | None] = mapped_column(Text)
 
 
@@ -207,6 +210,21 @@ class GrnLine(BusinessMixin, Base):
         String(16), default=InspectionResult.ACCEPT.value
     )
     notes: Mapped[str | None] = mapped_column(Text)
+
+
+class GrnAllocation(BusinessMixin, Base):
+    """How much of a GRN line's ACCEPTED quantity went to which PO-line allocation (and
+    therefore which BOQ line and project). Accepted quantity beyond every allocation is
+    free stock and has no row here. Written once when the quantity is accepted."""
+
+    __tablename__ = "grn_allocations"
+    __table_args__ = (CheckConstraint("qty > 0", name="qty_pos"),)
+
+    grn_line_id: Mapped[uuid.UUID] = fk("grn_lines.id", ondelete="CASCADE")
+    allocation_id: Mapped[uuid.UUID] = fk("po_line_allocations.id")
+    boq_line_id: Mapped[uuid.UUID] = fk("boq_lines.id")
+    project_id: Mapped[uuid.UUID] = fk("projects.id")
+    qty: Mapped[Decimal] = mapped_column(Qty)
 
 
 class VendorReturn(BusinessMixin, Base):

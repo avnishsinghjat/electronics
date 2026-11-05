@@ -1,6 +1,7 @@
 """Part master: search (MPN autocomplete) and inline creation."""
 
 import uuid
+from collections.abc import Iterable
 from typing import Any
 
 from sqlalchemy import func, or_, select
@@ -8,10 +9,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.errors import ConflictError, NotFoundError
 from app.core.ids import uuid7
+from app.core.repository import check_version
 from app.modules.auth.service import Principal
 from app.modules.boq.importer import norm_mpn
-from app.modules.parts.models import Part
-from app.modules.parts.schemas import PartCreate
+from app.modules.parts.models import Part, PartPreferredVendor
+from app.modules.parts.schemas import PartCreate, PartStockSettings
 
 
 def _norm_sql(column: Any) -> Any:
@@ -109,3 +111,39 @@ async def create_for_import(session: AsyncSession, specs: list[dict[str, Any]]) 
     if created:
         await session.flush()
     return created
+
+
+async def get_many(session: AsyncSession, part_ids: Iterable[uuid.UUID]) -> dict[uuid.UUID, Part]:
+    wanted = set(part_ids)
+    if not wanted:
+        return {}
+    rows = await session.execute(select(Part).where(Part.id.in_(wanted)))
+    return {p.id: p for p in rows.scalars()}
+
+
+async def preferred_vendors(
+    session: AsyncSession, part_ids: Iterable[uuid.UUID]
+) -> dict[uuid.UUID, uuid.UUID]:
+    """Part id -> its first-ranked preferred vendor."""
+    wanted = set(part_ids)
+    if not wanted:
+        return {}
+    rows = await session.execute(
+        select(PartPreferredVendor.part_id, PartPreferredVendor.vendor_id)
+        .where(PartPreferredVendor.part_id.in_(wanted), PartPreferredVendor.is_deleted.is_(False))
+        .order_by(PartPreferredVendor.rank.desc())
+    )
+    return {part_id: vendor_id for part_id, vendor_id in rows.all()}  # rank 1 wins (last)
+
+
+async def update_stock_settings(
+    session: AsyncSession, user: Principal, part_id: uuid.UUID, data: PartStockSettings
+) -> Part:
+    user.require("parts:manage")
+    part = await get(session, part_id)
+    check_version(part, data.row_version)
+    part.min_stock = data.min_stock
+    part.msl_level = data.msl_level
+    await session.flush()
+    await session.commit()
+    return part

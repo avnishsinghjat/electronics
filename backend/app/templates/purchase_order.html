@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{{ po.number }}</title>
+<style>
+  @font-face { font-family: "Inter"; src: url("fonts/inter-latin-wght-normal.woff2"); font-weight: 100 900; }
+  @font-face { font-family: "JetBrains Mono"; src: url("fonts/jetbrains-mono-latin-wght-normal.woff2"); font-weight: 100 800; }
+  @page {
+    size: A4; margin: 16mm 14mm 18mm 14mm;
+    @bottom-left { content: "{{ po.number }}{% if draft %} · DRAFT{% endif %}"; font: 8pt "Inter"; color: #667085; }
+    @bottom-right { content: "Page " counter(page) " of " counter(pages); font: 8pt "Inter"; color: #667085; }
+  }
+  * { box-sizing: border-box; }
+  body { font-family: "Inter", sans-serif; font-size: 9pt; color: #101828; margin: 0; }
+  .mono { font-family: "JetBrains Mono", monospace; font-variant-numeric: tabular-nums; }
+  .num { text-align: right; font-family: "JetBrains Mono", monospace; font-variant-numeric: tabular-nums; }
+  header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #1F4FD8; padding-bottom: 8px; }
+  header img { max-height: 48px; max-width: 160px; }
+  .company h1 { font-size: 14pt; margin: 0 0 2px; }
+  .company p, .doc p { margin: 0; color: #475467; line-height: 1.4; }
+  .doc { text-align: right; }
+  .doc h2 { font-size: 16pt; margin: 0; color: #1F4FD8; letter-spacing: 0.02em; }
+  .watermark { position: fixed; top: 40%; left: 10%; font-size: 72pt; color: rgba(217, 45, 32, 0.12); transform: rotate(-30deg); font-weight: 700; }
+  .parties { display: flex; gap: 12px; margin: 12px 0; }
+  .box { flex: 1; border: 1px solid #E6E8EC; border-radius: 4px; padding: 8px 10px; }
+  .box h3 { font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.06em; color: #667085; margin: 0 0 4px; }
+  .box p { margin: 0; line-height: 1.45; }
+  table { width: 100%; border-collapse: collapse; margin-top: 4px; }
+  th { background: #F8F9FB; text-align: left; font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.04em; color: #475467; border-bottom: 1px solid #D0D5DD; padding: 5px 6px; }
+  td { border-bottom: 1px solid #E6E8EC; padding: 5px 6px; vertical-align: top; }
+  tr { page-break-inside: avoid; }
+  .desc { color: #475467; font-size: 8pt; }
+  .totals { margin-top: 8px; margin-left: auto; width: 45%; }
+  .totals td { border: none; padding: 3px 6px; }
+  .totals tr.grand td { border-top: 1.5px solid #101828; font-weight: 700; }
+  .notes { margin-top: 14px; }
+  .notes h3 { font-size: 8pt; text-transform: uppercase; color: #667085; margin: 0 0 3px; }
+  .sign { margin-top: 36px; display: flex; justify-content: flex-end; }
+  .sign div { width: 55mm; border-top: 1px solid #101828; padding-top: 4px; text-align: center; color: #475467; }
+</style>
+</head>
+<body>
+{% if draft %}<div class="watermark">DRAFT</div>{% endif %}
+<header>
+  <div class="company">
+    {% if logo %}<img src="{{ logo }}" alt="">{% endif %}
+    <h1>{{ company.name }}</h1>
+    {% if company.address %}<p>{{ company.address }}</p>{% endif %}
+    {% if company.gstin %}<p>GSTIN <span class="mono">{{ company.gstin }}</span></p>{% endif %}
+  </div>
+  <div class="doc">
+    <h2>PURCHASE ORDER</h2>
+    <p class="mono">{{ po.number }}</p>
+    <p>Date {{ po.order_date or "—" }}</p>
+    {% if requisition %}<p>Requisition <span class="mono">{{ requisition }}</span></p>{% endif %}
+  </div>
+</header>
+
+<section class="parties">
+  <div class="box">
+    <h3>Vendor</h3>
+    <p><strong>{{ vendor.name }}</strong> <span class="mono">({{ vendor.code }})</span></p>
+    {% if vendor.address %}<p>{{ vendor.address }}</p>{% endif %}
+    {% if vendor.city or vendor.state %}<p>{{ [vendor.city, vendor.state] | select | join(", ") }}</p>{% endif %}
+    {% if vendor.gstin %}<p>GSTIN <span class="mono">{{ vendor.gstin }}</span></p>{% endif %}
+    {% for c in vendor.contacts[:2] %}<p>{{ c.name }}{% if c.phone %} · {{ c.phone }}{% endif %}{% if c.email %} · {{ c.email }}{% endif %}</p>{% endfor %}
+  </div>
+  <div class="box">
+    <h3>Terms</h3>
+    <p>Payment: {{ vendor.payment_terms or "As agreed" }}</p>
+    <p>Currency: {{ po.currency }}</p>
+    <p>Deliver to: {{ company.name }}{% if company.address %}, {{ company.address }}{% endif %}</p>
+  </div>
+</section>
+
+<table>
+  <thead>
+    <tr><th>#</th><th>Part</th><th class="num">Qty</th><th>Unit</th><th class="num">Unit price</th><th class="num">Amount</th><th>Delivery by</th></tr>
+  </thead>
+  <tbody>
+  {% for l in lines %}
+    <tr>
+      <td class="num">{{ l.line_no }}</td>
+      <td><span class="mono">{{ l.mpn }}</span>{% if l.manufacturer %} · {{ l.manufacturer }}{% endif %}<div class="desc">{{ l.description }}{% if l.cancelled %} · CANCELLED{% endif %}</div></td>
+      <td class="num">{{ l.qty }}</td>
+      <td>{{ l.unit }}</td>
+      <td class="num">{{ l.unit_price }}</td>
+      <td class="num">{{ l.amount }}</td>
+      <td class="mono">{{ l.expected_date or "—" }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<table class="totals">
+  <tr class="grand"><td>Total ({{ po.currency }}), before taxes</td><td class="num">{{ total }}</td></tr>
+  <tr><td colspan="2" class="desc">Taxes as applicable, shown on the vendor's tax invoice.</td></tr>
+</table>
+
+{% if po.notes %}<div class="notes"><h3>Notes</h3><p>{{ po.notes }}</p></div>{% endif %}
+<div class="notes"><h3>Conditions</h3>
+  <p>Quote the PO number on the delivery note and invoice. Moisture-sensitive parts must be supplied in sealed dry packs with the MSL label. A certificate of conformance is required with every delivery.</p>
+</div>
+<div class="sign"><div>Authorised signatory</div></div>
+</body>
+</html>

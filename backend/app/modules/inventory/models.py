@@ -47,6 +47,12 @@ class ReservationStatus(enum.StrEnum):
     RELEASED = "released"
 
 
+class AdjustmentStatus(enum.StrEnum):
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+
+
 class InventoryLocation(BusinessMixin, Base):
     __tablename__ = "inventory_locations"
     __table_args__ = (
@@ -135,3 +141,28 @@ class StockReservation(BusinessMixin, Base):
     qty: Mapped[Decimal] = mapped_column(Qty)
     status: Mapped[str] = status_column(ReservationStatus, ReservationStatus.ACTIVE)
     note: Mapped[str | None] = mapped_column(Text)
+
+
+class StockAdjustment(BusinessMixin, Base):
+    """A requested stock correction. Only an approval (by someone else) posts the ADJUST
+    ledger entry; the request itself never changes stock."""
+
+    __tablename__ = "stock_adjustments"
+    __table_args__ = (
+        CheckConstraint("qty_delta <> 0", name="qty_delta_nonzero"),
+        enum_check("status", AdjustmentStatus),
+    )
+
+    part_id: Mapped[uuid.UUID] = fk("parts.id")
+    location_id: Mapped[uuid.UUID] = fk("inventory_locations.id")
+    qty_delta: Mapped[Decimal] = mapped_column(Qty)
+    reason: Mapped[str] = mapped_column(Text)
+    lot_code: Mapped[str | None] = mapped_column(String(64))
+    status: Mapped[str] = status_column(AdjustmentStatus, AdjustmentStatus.PENDING)
+    requested_by: Mapped[uuid.UUID | None] = fk("users.id", nullable=True)
+    decided_by: Mapped[uuid.UUID | None] = fk("users.id", nullable=True)
+    decided_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    decision_note: Mapped[str | None] = mapped_column(Text)
+    ledger_entry_id: Mapped[int | None] = mapped_column(
+        BigInteger, ForeignKey("inventory_ledger.id", ondelete="RESTRICT"), index=True
+    )
