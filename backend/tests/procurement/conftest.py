@@ -61,7 +61,7 @@ class Ctx:
 
     async def boq(
         self,
-        lines: list[tuple[Any, str, str]] | list[tuple[Any, str, str, dict[str, Any]]],
+        lines: list[tuple[Any, ...]],
         *,
         build_qty: int = 10,
         module_id: Any = None,
@@ -82,7 +82,7 @@ class Ctx:
         payload = []
         for spec in lines:
             part, qty, category = spec[0], spec[1], spec[2]
-            extra = spec[3] if len(spec) > 3 else {}  # type: ignore[misc]
+            extra = spec[3] if len(spec) > 3 else {}
             payload.append(
                 {
                     "line_key": None,

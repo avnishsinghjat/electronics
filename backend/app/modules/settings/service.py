@@ -187,5 +187,10 @@ async def run_setup(session: AsyncSession, settings: Settings, data: SetupReques
     else:
         company.company_name = data.company_name
         company.setup_completed_at = utcnow()
+    # Reference data every plant needs (stock locations, the default stage template), so a
+    # fresh install can receive goods without running the seed command. Idempotent.
+    from app.seed import seed_reference_data  # local: the seed module imports most modules
+
+    await seed_reference_data(session)
     await session.commit()
     return admin

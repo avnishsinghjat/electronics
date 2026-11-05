@@ -2,6 +2,7 @@
 low-stock alerts and the ledger listing."""
 
 from decimal import Decimal
+from typing import Any
 
 from app.modules.inventory import service as inventory
 from app.modules.inventory.models import LedgerReason
@@ -11,11 +12,11 @@ from tests.procurement.conftest import Ctx
 D = Decimal
 
 
-async def _stock(ctx: Ctx, part: object, qty: int, loc: object | None = None) -> None:
+async def _stock(ctx: Ctx, part: Any, qty: int, loc: Any = None) -> None:
     await inventory.post_movement(
         ctx.session,
-        part_id=part.id,  # type: ignore[attr-defined]
-        location_id=(loc or ctx.stores_loc).id,  # type: ignore[attr-defined]
+        part_id=part.id,
+        location_id=(loc or ctx.stores_loc).id,
         qty_delta=qty,
         reason=LedgerReason.GRN,
         lot_code="LOT-A",

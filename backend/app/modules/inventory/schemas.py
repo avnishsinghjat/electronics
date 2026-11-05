@@ -36,6 +36,7 @@ class PartStock(BaseModel):
     description: str
     category: str
     unit: str
+    msl_level: int | None
     min_stock: int | None
     on_hand: Decimal
     usable: Decimal
@@ -43,6 +44,7 @@ class PartStock(BaseModel):
     available: Decimal
     low: bool
     locations: list[str]
+    row_version: int
 
 
 class LedgerRow(BaseModel):
@@ -100,6 +102,7 @@ class AdjustmentOut(BaseModel):
     reason: str
     lot_code: str | None
     status: str
+    requested_by: uuid.UUID | None
     requested_by_name: str | None
     requested_at: datetime
     decided_by_name: str | None

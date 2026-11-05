@@ -1,6 +1,7 @@
 """Clear to build, requisition rules, vendors, permissions and scoping, the PO PDF."""
 
 from decimal import Decimal
+from typing import Any
 
 from app.modules.boq.status import LineStatus, quantities
 from tests.factories import ModuleFactory, ProjectFactory, create, login, make_user, uniq
@@ -41,7 +42,7 @@ async def test_clear_to_build_edge_cases(ctx: Ctx) -> None:
     )
     await ctx.boq([(await ctx.part(), "1", "IC")], module_id=drafty.id, release=False)
 
-    def readiness(t: dict, module_id: object) -> dict:
+    def readiness(t: dict[str, Any], module_id: object) -> dict[str, Any]:
         return next(m for m in t["modules"] if m["module_id"] == str(module_id))
 
     t = await ctx.tracker()

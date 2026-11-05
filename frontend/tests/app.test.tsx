@@ -37,9 +37,9 @@ describe("App shell (signed in)", () => {
 
   it("unbuilt sections state which phase delivers them", async () => {
     mockApi(signedInRoutes());
-    renderAt("/procurement");
-    expect(await screen.findByRole("heading", { name: "Procurement is delivered in Phase 6" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Procurement" })).toHaveAttribute("aria-current", "page");
+    renderAt("/production");
+    expect(await screen.findByRole("heading", { name: "Production is delivered in Phase 7" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Production" })).toHaveAttribute("aria-current", "page");
   });
 
   it("Ctrl+K opens the command palette and navigates", async () => {

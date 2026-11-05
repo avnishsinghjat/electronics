@@ -21,10 +21,15 @@ const AuditLogPage = lazy(() => import("@/features/settings/AuditLogPage"));
 const ProjectsPage = lazy(() => import("@/features/projects/ProjectsPage"));
 const ProjectPage = lazy(() => import("@/features/projects/ProjectPage"));
 const BoqListPage = lazy(() => import("@/features/boq/BoqListPage"));
+const ProcurementPage = lazy(() => import("@/features/procurement/ProcurementPage"));
+const RequisitionPage = lazy(() => import("@/features/procurement/RequisitionPage"));
+const PurchaseOrderPage = lazy(() => import("@/features/procurement/PurchaseOrderPage"));
+const ReceiptPage = lazy(() => import("@/features/procurement/ReceiptPage"));
+const InventoryPage = lazy(() => import("@/features/inventory/InventoryPage"));
 
 /** Sections whose module is not built yet render the roadmap page. Each phase replaces
  *  its entry with the real lazily-loaded feature route. */
-const BUILT = new Set(["dashboard", "settings", "projects", "boq"]);
+const BUILT = new Set(["dashboard", "settings", "projects", "boq", "procurement", "inventory"]);
 const roadmapRoutes: RouteObject[] = NAV_ITEMS.filter((n) => !BUILT.has(n.id)).map((n) => ({
   path: n.to.slice(1),
   element: (
@@ -55,6 +60,11 @@ export const routes: RouteObject[] = [
               { path: "projects", element: <RequirePermission permission="projects:read"><ProjectsPage /></RequirePermission> },
               { path: "boq", element: <RequirePermission permission="boq:read"><BoqListPage /></RequirePermission> },
               { path: "projects/:projectId", element: <RequirePermission permission="projects:read"><ProjectPage /></RequirePermission> },
+              { path: "procurement", element: <RequirePermission permission="procurement:read"><ProcurementPage /></RequirePermission> },
+              { path: "procurement/requisitions/:prId", element: <RequirePermission permission="procurement:read"><RequisitionPage /></RequirePermission> },
+              { path: "procurement/orders/:poId", element: <RequirePermission permission="procurement:read"><PurchaseOrderPage /></RequirePermission> },
+              { path: "procurement/receipts/:grnId", element: <RequirePermission permission="procurement:read"><ReceiptPage /></RequirePermission> },
+              { path: "inventory", element: <RequirePermission permission="inventory:read"><InventoryPage /></RequirePermission> },
               {
                 path: "settings",
                 element: (

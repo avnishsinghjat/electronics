@@ -53,6 +53,12 @@ async def test_first_run_setup_creates_admin_and_signs_in(
     }
     after = (await client.get("/api/setup/status")).json()
     assert after["needs_setup"] is False and after["numbering"] == []
+    # Reference data is in place: goods can be received straight away.
+    codes = {
+        loc["code"]
+        for loc in (await client.get("/api/inventory/locations", headers=headers)).json()
+    }
+    assert {"STORES", "MSL-DRY-1", "QUAR", "SCRAP", "WIP"} <= codes
 
 
 async def test_setup_only_once(client: AsyncClient, db_session: AsyncSession) -> None:

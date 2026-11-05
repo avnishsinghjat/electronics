@@ -165,6 +165,18 @@
             "title": "Requested At",
             "type": "string"
           },
+          "requested_by": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requested By"
+          },
           "requested_by_name": {
             "anyOf": [
               {
@@ -195,6 +207,7 @@
           "reason",
           "lot_code",
           "status",
+          "requested_by",
           "requested_by_name",
           "requested_at",
           "decided_by_name",
@@ -4391,6 +4404,17 @@
             "title": "Mpn",
             "type": "string"
           },
+          "msl_level": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Msl Level"
+          },
           "on_hand": {
             "title": "On Hand",
             "type": "string"
@@ -4403,6 +4427,10 @@
           "reserved": {
             "title": "Reserved",
             "type": "string"
+          },
+          "row_version": {
+            "title": "Row Version",
+            "type": "integer"
           },
           "unit": {
             "title": "Unit",
@@ -4420,13 +4448,15 @@
           "description",
           "category",
           "unit",
+          "msl_level",
           "min_stock",
           "on_hand",
           "usable",
           "reserved",
           "available",
           "low",
-          "locations"
+          "locations",
+          "row_version"
         ],
         "title": "PartStock",
         "type": "object"

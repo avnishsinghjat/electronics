@@ -170,6 +170,7 @@ async def _adjustment_outs(
             reason=a.reason,
             lot_code=a.lot_code,
             status=a.status,
+            requested_by=a.requested_by,
             requested_by_name=names.get(a.requested_by) if a.requested_by else None,
             requested_at=a.created_at,
             decided_by_name=names.get(a.decided_by) if a.decided_by else None,

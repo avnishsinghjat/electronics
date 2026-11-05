@@ -444,6 +444,7 @@ async def part_stock(
                 "description": p.description,
                 "category": p.category,
                 "unit": p.unit,
+                "msl_level": p.msl_level,
                 "min_stock": p.min_stock,
                 "on_hand": on_hand.get(p.id, Decimal(0)),
                 "usable": use,
@@ -451,6 +452,7 @@ async def part_stock(
                 "available": available,
                 "low": low,
                 "locations": sorted(where.get(p.id, [])),
+                "row_version": p.row_version,
             }
         )
     return out

@@ -73,6 +73,11 @@ export async function adminApi(page: Page) {
       expect(r.ok(), await r.text()).toBe(true);
       return (await r.json()) as T;
     },
+    put: async <T>(path: string, data: unknown): Promise<T> => {
+      const r = await page.request.put(`/api${path}`, { headers, data });
+      expect(r.ok(), await r.text()).toBe(true);
+      return (await r.json()) as T;
+    },
     createUser: async (username: string, roles: string[]) => {
       const r = await page.request.post("/api/users", { headers, data: { username, full_name: `E2E ${username}`, roles } });
       expect(r.status(), await r.text()).toBe(201);
