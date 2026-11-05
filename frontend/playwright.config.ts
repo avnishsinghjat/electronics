@@ -12,6 +12,9 @@ const isCI = Boolean(process.env.CI);
 export default defineConfig({
   testDir: "./e2e",
   outputDir: "./test-results",
+  snapshotPathTemplate: "{testDir}/__screenshots__/{testFilePath}/{arg}{ext}",
+  // Tight tolerance: anti-aliasing noise only. A real regression changes far more pixels.
+  expect: { toHaveScreenshot: { maxDiffPixels: 50 } },
   fullyParallel: true,
   forbidOnly: isCI,
   retries: isCI ? 1 : 0,
@@ -20,6 +23,7 @@ export default defineConfig({
     baseURL: externalBaseUrl ?? "http://127.0.0.1:4173",
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
+    timezoneId: "Asia/Kolkata",
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"], viewport: { width: 1366, height: 768 } } }],
   webServer: externalBaseUrl

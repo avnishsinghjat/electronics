@@ -12,7 +12,8 @@ export default defineConfig({
   resolve: { alias: { "@": path.resolve(import.meta.dirname, "src") } },
   server: { host: "127.0.0.1", port: 5173, strictPort: true, proxy },
   preview: { host: "127.0.0.1", port: 4173, strictPort: true, proxy },
-  build: { outDir: "dist", sourcemap: true, assetsInlineLimit: 0 },
+  // LAN-served SPA: one ~220 kB gzip core chunk is fine; feature pages are split per route.
+  build: { outDir: "dist", sourcemap: true, assetsInlineLimit: 0, chunkSizeWarningLimit: 900 },
   test: {
     environment: "jsdom",
     globals: false,

@@ -13,5 +13,5 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["vite.config.ts", "tailwind.config.ts", "playwright.config.ts", "e2e"]
+  "include": ["vite.config.ts", "tailwind.config.ts", "playwright.config.ts", "e2e", "src/design/tokens.ts"]
 }

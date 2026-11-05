@@ -29,9 +29,9 @@ test("app loads with all non-localhost network blocked and attempts none", async
 
   await page.goto("/");
 
-  await expect(page.getByRole("heading", { name: "System status" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Dashboard" })).toBeVisible();
   // Real round trip through the proxy to the API and PostgreSQL.
-  const details = page.getByRole("region", { name: "Health" });
+  const details = page.getByLabel("Health");
   await expect(details.getByText("Database")).toBeVisible();
   await expect(details.getByText("LLM gateway not configured (delivered in Phase 9)")).toBeVisible();
   await page.waitForLoadState("networkidle");
@@ -56,7 +56,23 @@ test("app loads with all non-localhost network blocked and attempts none", async
 
 test("health shows OK for database against the real API", async ({ page }) => {
   await page.goto("/");
-  const details = page.getByRole("region", { name: "Health" });
-  const dbRow = details.locator("div", { has: page.getByText("Database", { exact: true }) });
+  const dbRow = page.getByLabel("Health").locator("div", { has: page.getByText("Database", { exact: true }) });
   await expect(dbRow.getByText("ok", { exact: true })).toBeVisible();
+});
+
+test("every page of the shell loads offline, including lazy routes", async ({ page, context }) => {
+  const external: string[] = [];
+  await context.route("**/*", async (route) => {
+    const url = new URL(route.request().url());
+    if (["data:", "blob:"].includes(url.protocol) || LOCAL_HOSTS.has(url.hostname)) await route.continue();
+    else {
+      external.push(url.href);
+      await route.abort("blockedbyclient");
+    }
+  });
+  for (const path of ["/", "/dev/ui", "/projects", "/qc", "/settings", "/missing"]) {
+    await page.goto(path);
+    await expect(page.getByRole("heading", { level: 1 }).or(page.getByRole("heading", { name: "Page not found" }))).toBeVisible();
+  }
+  expect(external).toEqual([]);
 });

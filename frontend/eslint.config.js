@@ -17,14 +17,25 @@ export default tseslint.config(
       "no-restricted-syntax": [
         "error",
         {
-          selector: "Literal[value=/^https?:\\/\\/(?!localhost|127\\.0\\.0\\.1)/]",
+          selector: "Literal[value=/^https?:\\/\\/(?!localhost|127\\.0\\.0\\.1|www\\.w3\\.org\\/2000\\/svg)/]",
           message: "Offline-first: no absolute external URLs in source (CLAUDE.md rule 1).",
         },
       ],
     },
   },
   {
+    // Library and wiring modules export variants/constants next to components; the rule
+    // only affects dev-server hot reload, not correctness.
+    files: ["src/design/**", "src/app/**"],
+    rules: { "react-refresh/only-export-components": "off" },
+  },
+  {
+    // TanStack Table/Virtual return non-memoisable functions; we do not use the React Compiler.
+    files: ["src/design/components/data-table/**"],
+    rules: { "react-hooks/incompatible-library": "off" },
+  },
+  {
     files: ["tests/**", "e2e/**"],
-    rules: { "no-restricted-syntax": "off" },
+    rules: { "no-restricted-syntax": "off", "@typescript-eslint/no-non-null-assertion": "off" },
   },
 );

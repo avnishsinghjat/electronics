@@ -1,41 +1,65 @@
 @import "./fonts.css";
+@import "./print.css";
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Phase 0 base theme (shadcn/ui CSS variables). The full token set and the textured
-   canvas are built in Phase 2 (src/design). */
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222 30% 12%;
-    --card: 0 0% 100%;
-    --card-foreground: 222 30% 12%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 30% 12%;
-    --primary: 224 75% 48%; /* #1F4FD8 engineering blue */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 220 20% 97%;
-    --secondary-foreground: 222 30% 12%;
-    --muted: 220 20% 97%;
-    --muted-foreground: 220 9% 40%;
-    --accent: 178 84% 34%; /* #0E9F9A teal */
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 72% 46%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 220 13% 91%; /* #E6E8EC */
-    --input: 220 13% 91%;
-    --ring: 224 75% 48%;
-    --radius: 0.5rem;
+    color-scheme: light;
+    --grid-dot: rgba(16, 24, 40, 0.04); /* 4% texture, never louder */
+    --hairline: linear-gradient(90deg, rgba(31, 79, 216, 0) 0%, rgba(31, 79, 216, 0.45) 35%, rgba(14, 159, 154, 0.45) 65%, rgba(14, 159, 154, 0) 100%);
   }
 
   * {
     @apply border-border;
   }
 
+  html,
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-white text-base text-foreground font-sans antialiased;
     font-feature-settings: "cv11", "ss01";
+  }
+
+  table,
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  :focus-visible {
+    outline: 2px solid theme("colors.accent.600");
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* App canvas: white with a CSS-only dot grid. Cards are opaque white, so the texture
+     disappears under them; a soft mask fades it towards the bottom of long pages. */
+  .app-canvas {
+    background-color: #ffffff;
+    background-image: radial-gradient(circle at 1px 1px, var(--grid-dot) 1px, transparent 0);
+    background-size: 16px 16px;
+    background-attachment: local;
+  }
+
+  .hairline-accent {
+    position: relative;
+  }
+  .hairline-accent::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 1px;
+    background: var(--hairline);
+    pointer-events: none;
+  }
+
+  .skeleton-shimmer {
+    background: linear-gradient(90deg, theme("colors.neutral.100") 0px, theme("colors.neutral.50") 120px, theme("colors.neutral.100") 240px);
+    background-size: 800px 100%;
+    @apply animate-shimmer;
   }
 }

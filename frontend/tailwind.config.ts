@@ -1,39 +1,51 @@
 import type { Config } from "tailwindcss";
 import animate from "tailwindcss-animate";
 
+import { colors, fontSize, fonts, radius, shadows, spacing, zIndex } from "./src/design/tokens";
+
+const zIndexScale = Object.fromEntries(Object.entries(zIndex).map(([k, v]) => [k, String(v)]));
+const fontSizeScale = Object.fromEntries(
+  Object.entries(fontSize).map(([k, [size, lineHeight]]) => [k, [size, { lineHeight }]]),
+) as Record<string, [string, { lineHeight: string }]>;
+
 export default {
   content: ["./index.html", "./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
-      fontFamily: {
-        sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
-        mono: ["JetBrains Mono", "ui-monospace", "SFMono-Regular", "monospace"],
-      },
+      fontFamily: { sans: [...fonts.sans], mono: [...fonts.mono] },
+      fontSize: fontSizeScale,
       colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
-        primary: { DEFAULT: "hsl(var(--primary))", foreground: "hsl(var(--primary-foreground))" },
-        secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+        neutral: colors.neutral,
+        accent: { ...colors.accent, DEFAULT: colors.accent[600], foreground: colors.white },
+        teal: colors.teal,
+        status: {
+          grey: colors.status.grey,
+          blue: colors.status.blue,
+          amber: colors.status.amber,
+          green: colors.status.green,
+          red: colors.status.red,
         },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
-        },
-        muted: { DEFAULT: "hsl(var(--muted))", foreground: "hsl(var(--muted-foreground))" },
-        accent: { DEFAULT: "hsl(var(--accent))", foreground: "hsl(var(--accent-foreground))" },
-        popover: { DEFAULT: "hsl(var(--popover))", foreground: "hsl(var(--popover-foreground))" },
-        card: { DEFAULT: "hsl(var(--card))", foreground: "hsl(var(--card-foreground))" },
+        border: colors.neutral[200],
+        input: colors.neutral[300],
+        ring: colors.accent[600],
+        background: colors.white,
+        foreground: colors.neutral[900],
+        primary: { DEFAULT: colors.accent[600], foreground: colors.white },
+        secondary: { DEFAULT: colors.neutral[50], foreground: colors.neutral[800] },
+        destructive: { DEFAULT: "#D92D20", foreground: colors.white },
+        muted: { DEFAULT: colors.neutral[100], foreground: colors.neutral[600] },
+        card: { DEFAULT: colors.white, foreground: colors.neutral[900] },
+        popover: { DEFAULT: colors.white, foreground: colors.neutral[900] },
+        sidebar: colors.neutral[50],
       },
-      borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+      borderRadius: { sm: radius.sm, md: radius.md, lg: radius.lg },
+      boxShadow: { xs: shadows.xs, sm: shadows.sm, md: shadows.md, focus: shadows.focus },
+      spacing: { sidebar: spacing.sidebar, "sidebar-collapsed": spacing.sidebarCollapsed, topbar: spacing.topbar, row: spacing.tableRow },
+      zIndex: zIndexScale,
+      keyframes: {
+        shimmer: { "0%": { backgroundPosition: "-400px 0" }, "100%": { backgroundPosition: "400px 0" } },
       },
+      animation: { shimmer: "shimmer 1.4s ease-in-out infinite" },
     },
   },
   plugins: [animate],

@@ -1,14 +1,18 @@
 import { QueryClientProvider, type QueryClient } from "@tanstack/react-query";
+import { RouterProvider } from "react-router-dom";
 
-import { SystemStatusPage } from "@/features/system/SystemStatusPage";
+import { createRouter } from "@/app/router";
+import { Toaster, TooltipProvider } from "@/design/components";
 
-/** Application root. The routed app shell replaces this single page in Phase 2. */
+const router = createRouter();
+
 export function App({ queryClient }: { queryClient: QueryClient }) {
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="min-h-screen">
-        <SystemStatusPage />
-      </div>
+      <TooltipProvider delayDuration={300}>
+        <RouterProvider router={router} />
+        <Toaster />
+      </TooltipProvider>
     </QueryClientProvider>
   );
 }

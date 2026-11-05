@@ -1,0 +1,60 @@
+/* Print stylesheet: reports and tables print clean on white A4, no chrome. */
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm 12mm;
+  }
+
+  html,
+  body,
+  .app-canvas {
+    background: #ffffff !important;
+  }
+
+  [data-print="hide"],
+  nav,
+  header[data-shell="topbar"],
+  aside[data-shell="sidebar"],
+  [data-sonner-toaster],
+  button {
+    display: none !important;
+  }
+
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: none !important;
+  }
+
+  [data-card] {
+    box-shadow: none !important;
+    border-color: #d0d5dd !important;
+    break-inside: avoid;
+  }
+
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    font-size: 9pt;
+  }
+  thead {
+    display: table-header-group; /* repeat headers on every page */
+  }
+  tr {
+    break-inside: avoid;
+  }
+  th,
+  td {
+    border-bottom: 0.5pt solid #d0d5dd !important;
+    position: static !important;
+  }
+
+  /* Virtualised tables print every row, not just the visible window. */
+  [data-virtual-spacer] {
+    display: none !important;
+  }
+
+  a[href]::after {
+    content: "";
+  }
+}
