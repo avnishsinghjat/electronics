@@ -7,6 +7,7 @@ from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.errors import ConflictError, NotFoundError
+from app.core.ids import uuid7
 from app.modules.auth.service import Principal
 from app.modules.boq.importer import norm_mpn
 from app.modules.parts.models import Part
@@ -84,28 +85,27 @@ async def create(
     return part
 
 
-async def create_for_import(
-    session: AsyncSession,
-    *,
-    mpn: str,
-    manufacturer: str | None,
-    description: str | None,
-    package: str | None,
-    value: str | None,
-    category: str | None,
-    unit: str,
-) -> Part:
-    """Part created while committing a BOQ import (caller holds boq:import)."""
-    part = Part(
-        mpn=mpn,
-        manufacturer=manufacturer,
-        description=(description or mpn)[:300],
-        package=package,
-        value=value,
-        category=category or "Other",
-        unit=unit,
-        notes="Created by BOQ import",
-    )
-    session.add(part)
-    await session.flush()
-    return part
+async def create_for_import(session: AsyncSession, specs: list[dict[str, Any]]) -> list[Part]:
+    """Parts created while committing a BOQ import (caller holds boq:import).
+
+    One flush for the whole batch: a 2,000-line client BOQ can bring hundreds of new parts.
+    Each spec has mpn, manufacturer, description, package, value, category and unit.
+    """
+    created = [
+        Part(
+            id=uuid7(),
+            mpn=spec["mpn"],
+            manufacturer=spec["manufacturer"],
+            description=(spec["description"] or spec["mpn"])[:300],
+            package=spec["package"],
+            value=spec["value"],
+            category=spec["category"] or "Other",
+            unit=spec["unit"],
+            notes="Created by BOQ import",
+        )
+        for spec in specs
+    ]
+    session.add_all(created)
+    if created:
+        await session.flush()
+    return created

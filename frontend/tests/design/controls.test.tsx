@@ -135,6 +135,19 @@ describe("NumberInput", () => {
     expect(screen.getByRole("button", { name: "Increase" })).toBeDisabled();
   });
 
+  it("reports valid numbers while typing, before blur, without reformatting the draft", async () => {
+    renderUi(<Harness precision={2} />);
+    const input = screen.getByLabelText("qty");
+    await userEvent.clear(input);
+    expect(screen.getByTestId("value")).toHaveTextContent("10"); // empty is settled on commit
+    await userEvent.type(input, "2.");
+    expect(screen.getByTestId("value")).toHaveTextContent("2");
+    expect(input).toHaveValue("2.");
+    await userEvent.type(input, "5");
+    expect(screen.getByTestId("value")).toHaveTextContent("2.5");
+    expect(input).toHaveFocus();
+  });
+
   it("restores the last value on garbage input", async () => {
     renderUi(<Harness />);
     const input = screen.getByLabelText("qty");

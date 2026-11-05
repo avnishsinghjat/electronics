@@ -123,7 +123,8 @@ function BuildCard({ rev, editable }: { rev: RevisionDetail; editable: boolean }
   }
   const dirty = build !== rev.build_qty || JSON.stringify(rates) !== JSON.stringify(rev.attrition_by_category);
   const used = new Set(rev.lines.map((l) => l.category).filter(Boolean) as string[]);
-  const cats = CATEGORIES.filter((c) => used.has(c) || c in rates);
+  // Only the categories this revision uses; the rest of the company defaults stay stored.
+  const cats = CATEGORIES.filter((c) => used.has(c));
   return (
     <Card>
       <CardHeader title="Build quantity and attrition" description="Required = qty per unit × build quantity × (1 + attrition %), rounded up. A line's own attrition overrides its category." />
@@ -282,7 +283,7 @@ export function BoqPanel({ tree }: { tree: ProjectTree }) {
             <div className="flex flex-wrap items-end gap-3">
               <Field label="BOQ" htmlFor="boq-select">
                 <Select
-                  className="w-72"
+                  className="w-80"
                   value={boq?.id}
                   onValueChange={(id) => { setBoqId(id); setRevId(null); }}
                   options={boqs.data.map((b) => ({ value: b.id, label: [b.name, b.module_code, b.assembly_label].filter(Boolean).join(" · ") }))}
@@ -314,7 +315,7 @@ export function BoqPanel({ tree }: { tree: ProjectTree }) {
                   <GitCompareArrows /> Compare
                 </Button>
               )}
-              {canImport && boq && <Button variant="secondary" onClick={() => setImporting(true)}><Upload /> Import file</Button>}
+              {canImport && boq && revisions.length > 0 && <Button variant="secondary" onClick={() => setImporting(true)}><Upload /> Import file</Button>}
               {canEdit && boq && !revisions.some((r) => r.status === "draft") && revisions.length > 0 && (
                 <Button variant="secondary" loading={newRevision.isPending} onClick={() => newRevision.mutate(boq.id, { onSuccess: (r) => { setRevId(r.id); toast.success(`Revision ${r.revision} started`); }, onError: (e) => toast.error(errMsg(e)) })}>
                   <Plus /> New revision

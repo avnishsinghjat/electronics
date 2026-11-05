@@ -2,8 +2,10 @@
 
 Reference data (always needed): inventory locations and the default production stage
 template. Sample data (flagged ``is_sample=True`` and labelled "Sample"): 2 divisions,
-3 projects, 4 modules, 5 PCB assemblies, 60 parts and 5 vendors. Vendor names, cities
-and GSTINs are invented for demonstration; they do not identify real companies.
+3 projects, 4 modules, 5 PCB assemblies, 60 parts and 5 vendors, plus one sample BOQ
+(revision A released, revision B a draft with changes, so compare has something to show).
+Vendor names, cities and GSTINs are invented for demonstration; they do not identify real
+companies.
 
 Idempotent: running it again adds nothing.
 """
@@ -14,12 +16,17 @@ from decimal import Decimal
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.ids import uuid7
+from app.core.models import utcnow
 from app.core.numbering import next_number
+from app.modules.boq.importer import split_ref_des
+from app.modules.boq.models import Boq, BoqLine, BoqRevision, RevisionStatus
 from app.modules.inventory.models import InventoryLocation, LocationKind
 from app.modules.org.models import Division, Module, PcbAssembly, Project, ProjectStatus
 from app.modules.parts.models import Part, PartCategory, PartPreferredVendor
 from app.modules.procurement.models import Vendor
 from app.modules.production.models import DEFAULT_STAGES, StageTemplate, StageTemplateStep
+from app.modules.settings.models import DEFAULT_ATTRITION
 
 SAMPLE_NOTE = "SAMPLE DATA: created by the seed script for demonstration. Safe to delete."
 
@@ -652,3 +659,115 @@ async def seed_sample_data(session: AsyncSession) -> int:
                 created += 1
     await session.flush()
     return created
+
+
+SAMPLE_BOQ_NAME = "PLC CPU board BOM (Sample)"
+
+# (MPN, ref des, qty per unit, DNP) for revision A of the sample BOQ.
+SAMPLE_BOQ_A: list[tuple[str, str, int, bool]] = [
+    ("GRM188R71H104KA93D", "C1-C8", 8, False),
+    ("GRM21BR61E106KA73L", "C9,C10", 2, False),
+    ("GRM1885C1H220JA01D", "C11,C12", 2, False),
+    ("RC0603FR-0710KL", "R1-R6", 6, False),
+    ("RC0603FR-071KL", "R7,R8", 2, False),
+    ("RC0603FR-074K7L", "R9-R12", 4, False),
+    ("BLM18PG221SN1D", "FB1", 1, False),
+    ("STM32F407VGT6", "U1", 1, False),
+    ("AMS1117-3.3", "U2", 1, False),
+    ("MCP2551-I/SN", "U3", 1, False),
+    ("RC0603JR-070RL", "R13", 1, True),
+]
+
+
+async def seed_sample_boqs(session: AsyncSession) -> int:
+    """One sample BOQ on the sample PLC rack's CPU board. Revision B differs from A by a
+    quantity change (C1-C10), a substituted part (R9-R12), a removed DNP line (R13) and an
+    added line (U4)."""
+    if await _exists(session, Boq, name=SAMPLE_BOQ_NAME):
+        return 0
+    row = (
+        await session.execute(
+            select(Project, Module, PcbAssembly)
+            .join(Module, Module.project_id == Project.id)
+            .join(PcbAssembly, PcbAssembly.module_id == Module.id)
+            .where(
+                Project.is_sample.is_(True), Module.code == "MOD-CPU", PcbAssembly.code == "CPU1"
+            )
+        )
+    ).first()
+    if row is None:  # sample structure not loaded (or deleted): nothing to attach to
+        return 0
+    project, module, assembly = row
+    parts = {
+        p.mpn: p
+        for p in (await session.execute(select(Part).where(Part.is_sample.is_(True)))).scalars()
+    }
+    boq = Boq(
+        project_id=project.id,
+        module_id=module.id,
+        assembly_id=assembly.id,
+        name=SAMPLE_BOQ_NAME,
+        notes=SAMPLE_NOTE,
+    )
+    session.add(boq)
+    await session.flush()
+    keys = {mpn: uuid7().hex for mpn, *_ in SAMPLE_BOQ_A}
+
+    def lines(rev: BoqRevision, spec: list[tuple[str, str, int, bool, str]]) -> list[BoqLine]:
+        out = []
+        for no, (mpn, ref, qty, dnp, key) in enumerate(spec, start=1):
+            part = parts[mpn]
+            out.append(
+                BoqLine(
+                    revision_id=rev.id,
+                    line_key=key,
+                    line_no=no,
+                    part_id=part.id,
+                    ref_des=",".join(split_ref_des(ref)),
+                    qty_per_unit=Decimal(qty),
+                    mpn=part.mpn,
+                    manufacturer=part.manufacturer,
+                    description=part.description,
+                    value=part.value,
+                    package=part.package,
+                    category=part.category,
+                    unit=part.unit,
+                    dnp=dnp,
+                    attrition_pct=Decimal(str(DEFAULT_ATTRITION.get(part.category, 0))),
+                )
+            )
+        return out
+
+    rev_a = BoqRevision(
+        boq_id=boq.id,
+        revision="A",
+        status=RevisionStatus.RELEASED.value,
+        build_qty=module.qty_to_deliver,
+        released_at=utcnow(),
+        attrition_by_category=dict(DEFAULT_ATTRITION),
+        notes="Sample: as received from the client.",
+    )
+    rev_b = BoqRevision(
+        boq_id=boq.id,
+        revision="B",
+        status=RevisionStatus.DRAFT.value,
+        build_qty=module.qty_to_deliver,
+        attrition_by_category=dict(DEFAULT_ATTRITION),
+        notes="Sample: client ECO 7 (extra decoupling, CAN-to-RS-485 option).",
+    )
+    session.add_all([rev_a, rev_b])
+    await session.flush()
+    spec_a = [(m, r, q, d, keys[m]) for m, r, q, d in SAMPLE_BOQ_A]
+    spec_b: list[tuple[str, str, int, bool, str]] = []
+    for mpn, ref, qty, dnp, key in spec_a:
+        if mpn == "GRM188R71H104KA93D":
+            spec_b.append((mpn, "C1-C10", 10, dnp, key))
+        elif mpn == "RC0603FR-074K7L":
+            spec_b.append(("ERJ-6ENF4701V", ref, qty, dnp, key))
+        elif mpn != "RC0603JR-070RL":
+            spec_b.append((mpn, ref, qty, dnp, key))
+    spec_b.append(("MAX3485ESA+", "U4", 1, False, uuid7().hex))
+    new = lines(rev_a, spec_a) + lines(rev_b, spec_b)
+    session.add_all(new)
+    await session.flush()
+    return 3 + len(new)

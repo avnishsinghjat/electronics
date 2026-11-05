@@ -52,7 +52,9 @@ test("division → project → module → assembly, attach a file, see it in His
   await ad.getByRole("button", { name: "Add assembly" }).click();
   await expect(module.getByText("Motor control board")).toBeVisible();
 
-  // Attach the assembly drawing and link it.
+  // Attach the assembly drawing and link it. Move the pointer off the toast stack first: it
+  // opens under the dialog's bottom-right button, and hovering keeps it expanded over the page.
+  await page.mouse.move(0, 0);
   await module.getByRole("button", { name: "Edit assembly MCB rev A" }).click();
   const edit = page.getByRole("dialog", { name: "Edit MCB rev A" });
   await edit.locator('input[type="file"]').setInputFiles(DRAWING);

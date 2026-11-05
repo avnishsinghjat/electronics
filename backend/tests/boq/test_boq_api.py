@@ -565,3 +565,38 @@ async def test_parts_create_inline_and_duplicates(
         },
     )
     assert ok.status_code == 201 and ok.json()["category"] == "IC"
+
+
+async def test_sample_boq_seed_is_visible_and_compares(
+    client: AsyncClient, ctx: dict[str, Any], db_session: AsyncSession
+) -> None:
+    from app.seed import SAMPLE_BOQ_NAME, seed_sample_boqs
+
+    assert await seed_sample_boqs(db_session) == 3 + 11 + 11
+    assert await seed_sample_boqs(db_session) == 0
+    boqs = (await client.get("/api/boqs", headers=ctx["h"])).json()
+    sample = next(b for b in boqs if b["name"] == SAMPLE_BOQ_NAME)
+    assert [(r["revision"], r["status"], r["line_count"]) for r in sample["revisions"]] == [
+        ("A", "released", 11),
+        ("B", "draft", 11),
+    ]
+    a = await _rev(client, ctx, sample["revisions"][0]["id"])
+    caps = next(ln for ln in a["lines"] if ln["mpn"] == "GRM188R71H104KA93D")
+    # 8 per unit x 25 units x 1.02 (passive attrition) = 204
+    assert (caps["ref_des"], caps["required_qty"], caps["status"]) == (
+        "C1,C2,C3,C4,C5,C6,C7,C8",
+        "204",
+        "Not ordered",
+    )
+    dnp = next(ln for ln in a["lines"] if ln["dnp"])
+    assert (dnp["required_qty"], dnp["status"]) == ("0", "Not required")
+    cmp = (
+        await client.get(f"/api/boqs/{sample['id']}/compare?from=A&to=B", headers=ctx["h"])
+    ).json()
+    assert {k: v for k, v in cmp["summary"].items() if v} == {
+        "added": 1,
+        "removed": 1,
+        "qty_changed": 1,
+        "substituted": 1,
+        "unchanged": 8,
+    }

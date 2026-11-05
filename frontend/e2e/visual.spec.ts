@@ -1,4 +1,4 @@
-import { expect, fontsReady, stubHealth, test } from "./fixtures";
+import { expect, fontsReady, stubDivisions, stubHealth, test } from "./fixtures";
 
 const SIZES = [
   { width: 1366, height: 768 },
@@ -13,6 +13,7 @@ for (const size of SIZES) {
 
     test("shell: dashboard", async ({ page }) => {
       await stubHealth(page);
+      await stubDivisions(page);
       await page.goto("/");
       await expect(page.getByText("2.4 ms")).toBeVisible();
       await fontsReady(page);
@@ -21,6 +22,7 @@ for (const size of SIZES) {
 
     test("shell: collapsed sidebar on a roadmap section", async ({ page }) => {
       await stubHealth(page);
+      await stubDivisions(page);
       await page.goto("/production");
       await page.getByRole("button", { name: "Collapse sidebar" }).click();
       await expect(page.getByRole("button", { name: "Expand sidebar" })).toBeVisible();
@@ -30,6 +32,7 @@ for (const size of SIZES) {
 
     test("dev/ui full page", async ({ page }) => {
       await stubHealth(page);
+      await stubDivisions(page);
       await page.goto("/dev/ui");
       await expect(page.getByText("10,000 of 10,000 rows")).toBeVisible();
       await fontsReady(page);

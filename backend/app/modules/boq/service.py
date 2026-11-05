@@ -412,6 +412,7 @@ async def release(
 # ---------------------------------------------------------------- lines
 
 
+_PART_FIELDS = ("mpn", "manufacturer", "description", "package", "value", "category", "unit")
 _TEMP_LINE_NO = 1_000_000
 
 
@@ -858,20 +859,15 @@ async def commit_import(
     lines = imp.result["lines"]
     keys = await _assign_keys(session, boq.id, lines)
     known = await parts.by_normalised_mpn(session, [ln["mpn"] for ln in lines if ln["mpn"]])
+    new_specs: dict[str, dict[str, Any]] = {}
+    for ln in lines:
+        norm = importer.norm_mpn(ln["mpn"]) if ln["mpn"] else None
+        if norm and norm not in known and norm not in new_specs:
+            new_specs[norm] = {k: ln[k] for k in _PART_FIELDS}
+    created = await parts.create_for_import(session, list(new_specs.values()))
+    known.update(zip(new_specs, created, strict=True))
     for idx, (ln, key) in enumerate(zip(lines, keys, strict=True), start=1):
         part = known.get(importer.norm_mpn(ln["mpn"])) if ln["mpn"] else None
-        if ln["mpn"] and part is None:
-            part = await parts.create_for_import(
-                session,
-                mpn=ln["mpn"],
-                manufacturer=ln["manufacturer"],
-                description=ln["description"],
-                package=ln["package"],
-                value=ln["value"],
-                category=ln["category"],
-                unit=ln["unit"],
-            )
-            known[importer.norm_mpn(ln["mpn"])] = part
         session.add(
             BoqLine(
                 revision_id=target.id,

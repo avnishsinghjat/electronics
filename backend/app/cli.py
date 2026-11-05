@@ -19,13 +19,14 @@ import app.models  # noqa: F401  (registers every table)
 from app.core.config import get_settings
 from app.core.db import dispose_engine, get_sessionmaker
 from app.modules.health.service import check_database, check_disk
-from app.seed import seed_reference_data, seed_sample_data
+from app.seed import seed_reference_data, seed_sample_boqs, seed_sample_data
 from app.worker import heartbeat_is_fresh
 
 Seeder = Callable[[AsyncSession], Awaitable[int]]
 SEEDERS: list[tuple[str, Seeder]] = [
     ("reference data", seed_reference_data),
     ("sample data", seed_sample_data),
+    ("sample BOQs", seed_sample_boqs),
 ]
 
 

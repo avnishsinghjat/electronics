@@ -76,7 +76,20 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
           aria-valuemax={max}
           disabled={disabled}
           value={draft}
-          onChange={(e) => setDraft(e.target.value)}
+          onChange={(e) => {
+            // Report valid numbers while typing so dependent UI (a Save button, a total)
+            // updates without waiting for blur; the draft text is only normalised on commit.
+            const raw = e.target.value;
+            setDraft(raw);
+            // An empty or unparsable draft is settled on commit (empty -> null, garbage ->
+            // the last value), so clearing the field to retype does not emit null.
+            const cleaned = raw.replace(/,/g, "").trim();
+            const parsed = Number(cleaned);
+            if (cleaned === "" || Number.isNaN(parsed)) return;
+            const next = Number(clamp(parsed, min, max).toFixed(precision));
+            setShown(next);
+            onValueChange(next);
+          }}
           onBlur={(e) => commit(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") commit((e.target as HTMLInputElement).value);

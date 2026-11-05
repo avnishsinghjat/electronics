@@ -51,5 +51,5 @@ with who made it and when.
 
 ## Tabs that appear later
 
-BOQ, Procurement, Production, QC and Documents tabs appear on the project page as their
-modules go live (Phases 5 to 11).
+The **BOQ** tab holds the project's bills of quantity: see [BOQ](boq.md). Procurement,
+Production, QC and Documents tabs appear as their modules go live (Phases 6 to 11).

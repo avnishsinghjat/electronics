@@ -136,7 +136,7 @@ describe("Project page", () => {
     renderAt("/projects/p1");
     expect(await screen.findByRole("heading", { level: 1, name: "PLC Rack" })).toBeInTheDocument();
     const tabs = screen.getByRole("tablist", { name: "Project sections" });
-    expect(within(tabs).getAllByRole("tab").map((t) => t.textContent)).toEqual(["Overview", "Files", "History"]);
+    expect(within(tabs).getAllByRole("tab").map((t) => t.textContent)).toEqual(["Overview", "BOQ", "Files", "History"]);
     const structure = screen.getByRole("region", { name: "Module MOD-CPU" });
     expect(within(structure).getByText("CPU board")).toBeInTheDocument();
     expect(within(structure).getByText("100 × 80")).toBeInTheDocument();

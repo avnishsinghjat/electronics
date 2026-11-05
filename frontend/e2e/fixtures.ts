@@ -22,6 +22,19 @@ export async function stubHealth(page: Page): Promise<void> {
   await page.route("**/api/health", (route) => route.fulfill({ json: FIXED_HEALTH }));
 }
 
+/** Fixed division list: other specs create divisions in the shared e2e database, and the
+ *  top bar's division switcher appears once there are two or more. */
+export async function stubDivisions(page: Page): Promise<void> {
+  await page.route("**/api/divisions", (route) =>
+    route.fulfill({
+      json: [
+        { id: "01900000-0000-7000-8000-000000000001", code: "IND", name: "Industrial controls", description: null, is_sample: false, row_version: 1 },
+        { id: "01900000-0000-7000-8000-000000000002", code: "PWR", name: "Power electronics", description: null, is_sample: false, row_version: 1 },
+      ],
+    }),
+  );
+}
+
 /** Wait for bundled fonts so text metrics are final before screenshots. */
 export async function fontsReady(page: Page): Promise<void> {
   await page.evaluate(() => document.fonts.ready.then(() => undefined));
@@ -54,6 +67,12 @@ export async function adminApi(page: Page) {
   const { access_token } = (await resp.json()) as { access_token: string };
   const headers = { Authorization: `Bearer ${access_token}` };
   return {
+    /** POST JSON as the administrator; asserts a 2xx response and returns the body. */
+    post: async <T>(path: string, data: unknown): Promise<T> => {
+      const r = await page.request.post(`/api${path}`, { headers, data });
+      expect(r.ok(), await r.text()).toBe(true);
+      return (await r.json()) as T;
+    },
     createUser: async (username: string, roles: string[]) => {
       const r = await page.request.post("/api/users", { headers, data: { username, full_name: `E2E ${username}`, roles } });
       expect(r.status(), await r.text()).toBe(201);

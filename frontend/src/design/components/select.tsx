@@ -34,7 +34,9 @@ export function Select(props: SelectProps) {
         className={cn(controlClasses, "flex h-9 items-center justify-between gap-2 text-left data-[placeholder]:text-neutral-500", className)}
         {...aria}
       >
-        <SelectPrimitive.Value placeholder={placeholder} />
+        <span className="min-w-0 flex-1 truncate">
+          <SelectPrimitive.Value placeholder={placeholder} />
+        </span>
         <SelectPrimitive.Icon>
           <ChevronDown className="size-4 text-neutral-500" />
         </SelectPrimitive.Icon>

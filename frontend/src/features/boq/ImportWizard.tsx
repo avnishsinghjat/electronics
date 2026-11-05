@@ -49,9 +49,9 @@ const issueColumns: ColumnDef<Issue, unknown>[] = [
       return <StatusPill tone={s.tone}>{s.label}</StatusPill>;
     },
   },
-  { accessorKey: "field", header: "Field", size: 110 },
-  { accessorKey: "message", header: "Problem", size: 520 },
-  { accessorKey: "code", header: "Code", size: 170, meta: { mono: true } },
+  { accessorKey: "field", header: "Field", size: 100 },
+  { accessorKey: "message", header: "Problem", size: 400 },
+  { accessorKey: "code", header: "Code", size: 160, meta: { mono: true } },
 ];
 
 function MappingStep({ session, client, onValidate, busy }: {
