@@ -8,6 +8,7 @@ import { readPref, writePref } from "@/lib/storage";
 import { CommandPalette, useCommandPaletteShortcut } from "./CommandPalette";
 import { isEnabled } from "./features";
 import { LlmStatus } from "./LlmStatus";
+import { DivisionSwitcher, ProjectSwitcher, useShowSwitchers } from "./Switchers";
 import { UserMenu } from "./UserMenu";
 import { Sidebar } from "./Sidebar";
 
@@ -24,6 +25,7 @@ function PageFallback() {
 export function Shell() {
   const [collapsed, setCollapsed] = React.useState(() => readPref("sidebar-collapsed") === "1");
   const [paletteOpen, setPaletteOpen] = React.useState(false);
+  const showSwitchers = useShowSwitchers() && isEnabled("projectSwitcher");
   useCommandPaletteShortcut(setPaletteOpen);
 
   const toggle = () =>
@@ -50,6 +52,12 @@ export function Shell() {
             <span className="flex-1 text-left">Search or jump to…</span>
             <kbd className="rounded border bg-white px-1.5 py-0.5 font-mono text-2xs text-neutral-500">Ctrl K</kbd>
           </button>
+          {showSwitchers && (
+            <div className="hidden items-center gap-2 lg:flex">
+              <DivisionSwitcher />
+              <ProjectSwitcher />
+            </div>
+          )}
           <div className="ml-auto flex items-center gap-2">
             <LlmStatus />
             {isEnabled("auth") && <UserMenu />}

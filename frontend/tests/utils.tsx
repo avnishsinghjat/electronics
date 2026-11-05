@@ -5,6 +5,7 @@ import { MemoryRouter, RouterProvider, createMemoryRouter, type RouteObject } fr
 
 import { routes } from "@/app/router";
 import { AuthProvider } from "@/features/auth/AuthContext";
+import { DivisionProvider } from "@/features/projects/DivisionContext";
 
 import { Toaster, TooltipProvider } from "@/design/components";
 
@@ -66,7 +67,7 @@ export const ALL_PERMISSIONS = [
   "wo:release", "wo:override_release", "kitting:issue", "stage:progress", "qc:read", "qc:inspect", "qc:manage_templates",
   "ncr:raise", "ncr:close", "reports:read", "reports:read_issued", "reports:create", "reports:review", "reports:approve",
   "documents:read", "documents:draft", "documents:approve", "design:read", "design:run", "design:signoff", "llm:use",
-  "llm:manage", "dashboard:read",
+  "llm:manage", "dashboard:read", "projects:history", "directory:read",
 ];
 
 export function makeMe(overrides: Partial<Me> = {}): Me {
@@ -119,10 +120,12 @@ export function renderAt(path: string, routeTable: RouteObject[] = routes) {
   render(
     <QueryClientProvider client={client}>
       <AuthProvider>
-        <TooltipProvider>
-          <RouterProvider router={router} />
-          <Toaster />
-        </TooltipProvider>
+        <DivisionProvider>
+          <TooltipProvider>
+            <RouterProvider router={router} />
+            <Toaster />
+          </TooltipProvider>
+        </DivisionProvider>
       </AuthProvider>
     </QueryClientProvider>,
   );

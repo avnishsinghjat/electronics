@@ -7,7 +7,7 @@ import "react-day-picker/style.css";
 
 import { cn } from "@/lib/utils";
 
-import { controlClasses } from "./field";
+import { controlClasses, useFieldControl } from "./field";
 
 export const DATE_FORMAT = "dd MMM yyyy";
 
@@ -22,10 +22,12 @@ export interface DatePickerProps {
   className?: string;
   "aria-invalid"?: boolean;
   "aria-describedby"?: string;
+  "aria-required"?: boolean;
 }
 
 /** Date field: type "dd MMM yyyy" (or ISO yyyy-mm-dd) or pick from the calendar. */
-export function DatePicker({ id, value, onChange, placeholder = "dd MMM yyyy", disabled, minDate, maxDate, className, ...aria }: DatePickerProps) {
+export function DatePicker(props: DatePickerProps) {
+  const { id, value, onChange, placeholder = "dd MMM yyyy", disabled, minDate, maxDate, className, ...aria } = useFieldControl(props);
   const [open, setOpen] = React.useState(false);
   const [text, setText] = React.useState(value ? format(value, DATE_FORMAT) : "");
   const [shown, setShown] = React.useState(value);

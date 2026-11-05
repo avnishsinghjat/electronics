@@ -81,15 +81,17 @@ export const spacing = {
   tableRow: "36px",
 } as const;
 
+/** Popovers (select lists, date pickers, menus) sit above modals because they are opened
+ *  from inside dialogs and drawers. */
 export const zIndex = {
   base: 0,
   sticky: 10,
   sidebar: 20,
-  dropdown: 30,
   overlay: 40,
   modal: 50,
-  toast: 60,
-  tooltip: 70,
+  dropdown: 60,
+  toast: 70,
+  tooltip: 80,
 } as const;
 
 export const fonts = {

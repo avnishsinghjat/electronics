@@ -5,7 +5,7 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
-import { controlClasses } from "./field";
+import { controlClasses, useFieldControl } from "./field";
 
 export interface ComboboxOption {
   value: string;
@@ -34,7 +34,11 @@ export interface ComboboxProps {
 /** Result of the last completed search, keyed by the query it answered. */
 type LoadState = { query: string | null; options: ComboboxOption[]; error?: string };
 
-export function Combobox({
+export function Combobox(props: ComboboxProps) {
+  return <ComboboxInner {...useFieldControl(props)} />;
+}
+
+function ComboboxInner({
   id,
   value,
   onChange,

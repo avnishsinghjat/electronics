@@ -46,6 +46,8 @@ PERMISSIONS: dict[str, str] = {
     "divisions:manage": "Create and edit divisions",
     "projects:read": "View projects, modules and assemblies (within scope)",
     "projects:manage": "Create, edit, clone projects, modules and assemblies",
+    "projects:history": "View a project's change history",
+    "directory:read": "See staff names in pickers (project manager, inspector, ...)",
     "files:upload": "Attach files to records",
     "files:delete": "Delete attached files",
     # BOQ and parts
@@ -99,6 +101,8 @@ PERMISSIONS: dict[str, str] = {
 }
 
 _READ_ALL = {
+    "projects:history",
+    "directory:read",
     "divisions:read",
     "projects:read",
     "boq:read",

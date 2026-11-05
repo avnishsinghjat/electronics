@@ -11,6 +11,7 @@ from app.core.db import dispose_engine
 from app.core.errors import register_error_handlers
 from app.core.logging import configure_logging
 from app.core.middleware import RequestContextMiddleware
+from app.modules.attachments.router import router as attachments_router
 from app.modules.audit.router import router as audit_router
 from app.modules.auth.router import router as auth_router
 from app.modules.health.router import router as health_router
@@ -50,6 +51,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         users_router,
         audit_router,
         org_router,
+        attachments_router,
     ):
         app.include_router(router, prefix=API_PREFIX)
     return app

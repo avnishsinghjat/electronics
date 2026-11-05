@@ -54,9 +54,14 @@ async def dispose_engine() -> None:
 
 
 async def get_session() -> AsyncIterator[AsyncSession]:
-    """FastAPI dependency yielding a session; overridden in tests for rollback isolation."""
+    """FastAPI dependency: one session per request. Services commit explicitly; anything
+    not committed when the request fails is rolled back."""
     async with get_sessionmaker()() as session:
-        yield session
+        try:
+            yield session
+        except Exception:
+            await session.rollback()
+            raise
 
 
 async def ping(session: AsyncSession) -> None:

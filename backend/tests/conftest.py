@@ -20,7 +20,7 @@ from alembic.config import Config
 from fastapi import FastAPI
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import make_url, text
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncConnection, AsyncEngine, AsyncSession, create_async_engine
 
 from app import models as _models  # noqa: F401  (registers every table)
 from app.core.config import Settings, get_settings
@@ -77,17 +77,27 @@ def admin_url() -> str:
 
 
 @pytest_asyncio.fixture(loop_scope="session")
-async def db_session(engine: AsyncEngine) -> AsyncIterator[AsyncSession]:
+async def db_conn(engine: AsyncEngine) -> AsyncIterator[AsyncConnection]:
+    """One connection and outer transaction per test, rolled back at the end."""
     async with engine.connect() as conn:
         outer = await conn.begin()
-        session = AsyncSession(
-            bind=conn, join_transaction_mode="create_savepoint", expire_on_commit=False
-        )
         try:
-            yield session
+            yield conn
         finally:
-            await session.close()
             await outer.rollback()
+
+
+def _savepoint_session(conn: AsyncConnection) -> AsyncSession:
+    return AsyncSession(bind=conn, join_transaction_mode="create_savepoint", expire_on_commit=False)
+
+
+@pytest_asyncio.fixture(loop_scope="session")
+async def db_session(db_conn: AsyncConnection) -> AsyncIterator[AsyncSession]:
+    session = _savepoint_session(db_conn)
+    try:
+        yield session
+    finally:
+        await session.close()
 
 
 @pytest.fixture
@@ -104,11 +114,22 @@ def settings(tmp_path: Path, test_database_url: str) -> Settings:
 
 
 @pytest.fixture
-def app(settings: Settings, db_session: AsyncSession) -> FastAPI:
+def app(settings: Settings, db_conn: AsyncConnection, db_session: AsyncSession) -> FastAPI:
     application = create_app(settings)
 
     async def _session_override() -> AsyncIterator[AsyncSession]:
-        yield db_session
+        # Like production, every request gets its own session (here on the test's
+        # connection, inside a savepoint): a failed request rolls back only its own work
+        # and never touches objects the test holds in db_session.
+        await db_session.flush()
+        session = _savepoint_session(db_conn)
+        try:
+            yield session
+        except Exception:
+            await session.rollback()
+            raise
+        finally:
+            await session.close()
 
     application.dependency_overrides[get_session] = _session_override
     application.dependency_overrides[get_settings] = lambda: settings

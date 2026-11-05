@@ -3,7 +3,7 @@ import { Check, ChevronDown } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
-import { controlClasses } from "./field";
+import { controlClasses, useFieldControl } from "./field";
 
 export interface SelectOption {
   value: string;
@@ -22,9 +22,11 @@ interface SelectProps {
   "aria-label"?: string;
   "aria-invalid"?: boolean;
   "aria-describedby"?: string;
+  "aria-required"?: boolean;
 }
 
-export function Select({ id, value, onValueChange, options, placeholder = "Select…", disabled, className, ...aria }: SelectProps) {
+export function Select(props: SelectProps) {
+  const { id, value, onValueChange, options, placeholder = "Select…", disabled, className, ...aria } = useFieldControl(props);
   return (
     <SelectPrimitive.Root value={value} onValueChange={onValueChange} disabled={disabled}>
       <SelectPrimitive.Trigger

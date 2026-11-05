@@ -3,7 +3,7 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
-import { controlClasses } from "./field";
+import { controlClasses, useFieldControl } from "./field";
 
 export interface NumberInputProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "value" | "onChange" | "type"> {
@@ -25,7 +25,8 @@ function clamp(n: number, min?: number, max?: number): number {
 
 /** Numeric field with a unit suffix and +/- steppers. Quantities render in JetBrains Mono. */
 export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
-  ({ value, onValueChange, unit, min, max, step = 1, precision = 0, className, disabled, ...props }, ref) => {
+  ({ value, onValueChange, unit, min, max, step = 1, precision = 0, className, disabled, ...rest }, ref) => {
+    const props = useFieldControl(rest);
     const [draft, setDraft] = React.useState(value === null ? "" : value.toFixed(precision));
     const [shown, setShown] = React.useState(value);
     if (value !== shown) {

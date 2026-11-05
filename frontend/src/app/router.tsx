@@ -18,10 +18,12 @@ const SettingsLayout = lazy(() => import("@/features/settings/SettingsLayout"));
 const GeneralSettingsPage = lazy(() => import("@/features/settings/GeneralSettingsPage"));
 const UsersPage = lazy(() => import("@/features/settings/UsersPage"));
 const AuditLogPage = lazy(() => import("@/features/settings/AuditLogPage"));
+const ProjectsPage = lazy(() => import("@/features/projects/ProjectsPage"));
+const ProjectPage = lazy(() => import("@/features/projects/ProjectPage"));
 
 /** Sections whose module is not built yet render the roadmap page. Each phase replaces
  *  its entry with the real lazily-loaded feature route. */
-const BUILT = new Set(["dashboard", "settings"]);
+const BUILT = new Set(["dashboard", "settings", "projects"]);
 const roadmapRoutes: RouteObject[] = NAV_ITEMS.filter((n) => !BUILT.has(n.id)).map((n) => ({
   path: n.to.slice(1),
   element: (
@@ -49,6 +51,8 @@ export const routes: RouteObject[] = [
             children: [
               { index: true, element: <HomeRoute dashboard={<DashboardPage />} /> },
               ...roadmapRoutes,
+              { path: "projects", element: <RequirePermission permission="projects:read"><ProjectsPage /></RequirePermission> },
+              { path: "projects/:projectId", element: <RequirePermission permission="projects:read"><ProjectPage /></RequirePermission> },
               {
                 path: "settings",
                 element: (

@@ -1,6 +1,544 @@
 {
   "components": {
     "schemas": {
+      "AssemblyCreate": {
+        "properties": {
+          "assembly_drawing_file_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assembly Drawing File Id"
+          },
+          "board_name": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Board Name",
+            "type": "string"
+          },
+          "code": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,31}$",
+            "title": "Code",
+            "type": "string"
+          },
+          "finish": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finish"
+          },
+          "kicad_project_file_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kicad Project File Id"
+          },
+          "layer_count": {
+            "anyOf": [
+              {
+                "maximum": 64.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Layer Count"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 5000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "qty_per_module": {
+            "anyOf": [
+              {
+                "maximum": 1000.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Qty Per Module"
+          },
+          "revision": {
+            "maxLength": 16,
+            "minLength": 1,
+            "title": "Revision",
+            "type": "string"
+          },
+          "size_x_mm": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "maximum": 2000.0,
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size X Mm"
+          },
+          "size_y_mm": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "maximum": 2000.0,
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size Y Mm"
+          },
+          "stage_template_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stage Template Id"
+          }
+        },
+        "required": [
+          "board_name",
+          "revision",
+          "code"
+        ],
+        "title": "AssemblyCreate",
+        "type": "object"
+      },
+      "AssemblyOut": {
+        "properties": {
+          "assembly_drawing_file_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assembly Drawing File Id"
+          },
+          "board_name": {
+            "title": "Board Name",
+            "type": "string"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "finish": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finish"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kicad_project_file_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kicad Project File Id"
+          },
+          "layer_count": {
+            "title": "Layer Count",
+            "type": "integer"
+          },
+          "module_id": {
+            "format": "uuid",
+            "title": "Module Id",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "qty_per_module": {
+            "title": "Qty Per Module",
+            "type": "integer"
+          },
+          "revision": {
+            "title": "Revision",
+            "type": "string"
+          },
+          "row_version": {
+            "title": "Row Version",
+            "type": "integer"
+          },
+          "size_x_mm": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size X Mm"
+          },
+          "size_y_mm": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size Y Mm"
+          },
+          "stage_template_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stage Template Id"
+          }
+        },
+        "required": [
+          "id",
+          "module_id",
+          "code",
+          "board_name",
+          "revision",
+          "qty_per_module",
+          "layer_count",
+          "size_x_mm",
+          "size_y_mm",
+          "finish",
+          "kicad_project_file_id",
+          "assembly_drawing_file_id",
+          "stage_template_id",
+          "notes",
+          "row_version"
+        ],
+        "title": "AssemblyOut",
+        "type": "object"
+      },
+      "AssemblyUpdate": {
+        "properties": {
+          "assembly_drawing_file_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assembly Drawing File Id"
+          },
+          "board_name": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Board Name"
+          },
+          "code": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,31}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Code"
+          },
+          "finish": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finish"
+          },
+          "kicad_project_file_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kicad Project File Id"
+          },
+          "layer_count": {
+            "anyOf": [
+              {
+                "maximum": 64.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Layer Count"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 5000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "qty_per_module": {
+            "anyOf": [
+              {
+                "maximum": 1000.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Qty Per Module"
+          },
+          "revision": {
+            "anyOf": [
+              {
+                "maxLength": 16,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revision"
+          },
+          "row_version": {
+            "title": "Row Version",
+            "type": "integer"
+          },
+          "size_x_mm": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "maximum": 2000.0,
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size X Mm"
+          },
+          "size_y_mm": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "maximum": 2000.0,
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size Y Mm"
+          },
+          "stage_template_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stage Template Id"
+          }
+        },
+        "required": [
+          "row_version"
+        ],
+        "title": "AssemblyUpdate",
+        "type": "object"
+      },
+      "AttachmentOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "mime": {
+            "title": "Mime",
+            "type": "string"
+          },
+          "original_name": {
+            "title": "Original Name",
+            "type": "string"
+          },
+          "previewable": {
+            "title": "Previewable",
+            "type": "boolean"
+          },
+          "ref_id": {
+            "format": "uuid",
+            "title": "Ref Id",
+            "type": "string"
+          },
+          "ref_type": {
+            "title": "Ref Type",
+            "type": "string"
+          },
+          "row_version": {
+            "title": "Row Version",
+            "type": "integer"
+          },
+          "sha256": {
+            "title": "Sha256",
+            "type": "string"
+          },
+          "size_bytes": {
+            "title": "Size Bytes",
+            "type": "integer"
+          },
+          "uploaded_by": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Uploaded By"
+          },
+          "uploaded_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Uploaded By Name"
+          }
+        },
+        "required": [
+          "id",
+          "ref_type",
+          "ref_id",
+          "original_name",
+          "mime",
+          "size_bytes",
+          "sha256",
+          "uploaded_by",
+          "uploaded_by_name",
+          "created_at",
+          "previewable",
+          "row_version"
+        ],
+        "title": "AttachmentOut",
+        "type": "object"
+      },
       "AuditAction": {
         "enum": [
           "insert",
@@ -169,6 +707,32 @@
           "page_size"
         ],
         "title": "AuditPage",
+        "type": "object"
+      },
+      "Body_upload_api_files_post": {
+        "properties": {
+          "file": {
+            "contentMediaType": "application/octet-stream",
+            "title": "File",
+            "type": "string"
+          },
+          "ref_id": {
+            "format": "uuid",
+            "title": "Ref Id",
+            "type": "string"
+          },
+          "ref_type": {
+            "maxLength": 64,
+            "title": "Ref Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ref_type",
+          "ref_id",
+          "file"
+        ],
+        "title": "Body_upload_api_files_post",
         "type": "object"
       },
       "Body_upload_logo_api_settings_logo_post": {
@@ -434,6 +998,38 @@
         "title": "DatabaseHealth",
         "type": "object"
       },
+      "DirectoryUser": {
+        "properties": {
+          "full_name": {
+            "title": "Full Name",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "roles": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Roles",
+            "type": "array"
+          },
+          "username": {
+            "title": "Username",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "username",
+          "full_name",
+          "roles"
+        ],
+        "title": "DirectoryUser",
+        "type": "object"
+      },
       "DiskHealth": {
         "properties": {
           "detail": {
@@ -492,6 +1088,39 @@
         "title": "DiskHealth",
         "type": "object"
       },
+      "DivisionCreate": {
+        "properties": {
+          "code": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,31}$",
+            "title": "Code",
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "name": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "name"
+        ],
+        "title": "DivisionCreate",
+        "type": "object"
+      },
       "DivisionOut": {
         "properties": {
           "code": {
@@ -536,6 +1165,56 @@
           "row_version"
         ],
         "title": "DivisionOut",
+        "type": "object"
+      },
+      "DivisionUpdate": {
+        "properties": {
+          "code": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,31}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Code"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "row_version": {
+            "title": "Row Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "row_version"
+        ],
+        "title": "DivisionUpdate",
         "type": "object"
       },
       "FileRef": {
@@ -612,6 +1291,72 @@
           "llm"
         ],
         "title": "HealthResponse",
+        "type": "object"
+      },
+      "HistoryEntry": {
+        "properties": {
+          "action": {
+            "title": "Action",
+            "type": "string"
+          },
+          "actor_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actor Name"
+          },
+          "changed_fields": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Changed Fields"
+          },
+          "entity_id": {
+            "title": "Entity Id",
+            "type": "string"
+          },
+          "entity_type": {
+            "title": "Entity Type",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "occurred_at": {
+            "format": "date-time",
+            "title": "Occurred At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "occurred_at",
+          "actor_name",
+          "action",
+          "entity_type",
+          "entity_id",
+          "label",
+          "changed_fields"
+        ],
+        "title": "HistoryEntry",
         "type": "object"
       },
       "LlmHealth": {
@@ -738,6 +1483,221 @@
         "title": "MeOut",
         "type": "object"
       },
+      "ModuleCreate": {
+        "properties": {
+          "code": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,31}$",
+            "title": "Code",
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "name": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "qty_to_deliver": {
+            "maximum": 10000000.0,
+            "minimum": 0.0,
+            "title": "Qty To Deliver",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "code",
+          "name",
+          "qty_to_deliver"
+        ],
+        "title": "ModuleCreate",
+        "type": "object"
+      },
+      "ModuleOut": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "project_id": {
+            "format": "uuid",
+            "title": "Project Id",
+            "type": "string"
+          },
+          "qty_to_deliver": {
+            "title": "Qty To Deliver",
+            "type": "integer"
+          },
+          "row_version": {
+            "title": "Row Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "project_id",
+          "code",
+          "name",
+          "qty_to_deliver",
+          "description",
+          "row_version"
+        ],
+        "title": "ModuleOut",
+        "type": "object"
+      },
+      "ModuleUpdate": {
+        "properties": {
+          "code": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,31}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Code"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "qty_to_deliver": {
+            "anyOf": [
+              {
+                "maximum": 10000000.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Qty To Deliver"
+          },
+          "row_version": {
+            "title": "Row Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "row_version"
+        ],
+        "title": "ModuleUpdate",
+        "type": "object"
+      },
+      "ModuleWithAssemblies": {
+        "properties": {
+          "assemblies": {
+            "items": {
+              "$ref": "#/components/schemas/AssemblyOut"
+            },
+            "title": "Assemblies",
+            "type": "array"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "project_id": {
+            "format": "uuid",
+            "title": "Project Id",
+            "type": "string"
+          },
+          "qty_to_deliver": {
+            "title": "Qty To Deliver",
+            "type": "integer"
+          },
+          "row_version": {
+            "title": "Row Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "project_id",
+          "code",
+          "name",
+          "qty_to_deliver",
+          "description",
+          "row_version",
+          "assemblies"
+        ],
+        "title": "ModuleWithAssemblies",
+        "type": "object"
+      },
       "NumberingOut": {
         "properties": {
           "description": {
@@ -807,6 +1767,306 @@
           "description"
         ],
         "title": "PermissionInfo",
+        "type": "object"
+      },
+      "ProjectClone": {
+        "properties": {
+          "client_po_ref": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Po Ref"
+          },
+          "due_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due Date"
+          },
+          "include_boq": {
+            "default": false,
+            "title": "Include Boq",
+            "type": "boolean"
+          },
+          "name": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Date"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "ProjectClone",
+        "type": "object"
+      },
+      "ProjectCreate": {
+        "properties": {
+          "client_name": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Client Name",
+            "type": "string"
+          },
+          "client_po_ref": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Po Ref"
+          },
+          "division_id": {
+            "format": "uuid",
+            "title": "Division Id",
+            "type": "string"
+          },
+          "due_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due Date"
+          },
+          "name": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 5000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "project_manager_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Manager Id"
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Date"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ProjectStatus",
+            "default": "draft"
+          }
+        },
+        "required": [
+          "division_id",
+          "name",
+          "client_name"
+        ],
+        "title": "ProjectCreate",
+        "type": "object"
+      },
+      "ProjectListItem": {
+        "properties": {
+          "client_name": {
+            "title": "Client Name",
+            "type": "string"
+          },
+          "client_po_ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Po Ref"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "division_code": {
+            "title": "Division Code",
+            "type": "string"
+          },
+          "division_id": {
+            "format": "uuid",
+            "title": "Division Id",
+            "type": "string"
+          },
+          "division_name": {
+            "title": "Division Name",
+            "type": "string"
+          },
+          "due_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due Date"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_sample": {
+            "title": "Is Sample",
+            "type": "boolean"
+          },
+          "module_count": {
+            "title": "Module Count",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "project_manager_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Manager Id"
+          },
+          "project_manager_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Manager Name"
+          },
+          "row_version": {
+            "title": "Row Version",
+            "type": "integer"
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Date"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "division_id",
+          "code",
+          "name",
+          "client_name",
+          "client_po_ref",
+          "start_date",
+          "due_date",
+          "status",
+          "project_manager_id",
+          "notes",
+          "is_sample",
+          "row_version",
+          "created_at",
+          "updated_at",
+          "division_code",
+          "division_name",
+          "project_manager_name",
+          "module_count"
+        ],
+        "title": "ProjectListItem",
         "type": "object"
       },
       "ProjectOut": {
@@ -938,7 +2198,7 @@
         "properties": {
           "items": {
             "items": {
-              "$ref": "#/components/schemas/ProjectOut"
+              "$ref": "#/components/schemas/ProjectListItem"
             },
             "title": "Items",
             "type": "array"
@@ -963,6 +2223,158 @@
           "page_size"
         ],
         "title": "ProjectPage",
+        "type": "object"
+      },
+      "ProjectStatus": {
+        "enum": [
+          "draft",
+          "active",
+          "on_hold",
+          "completed",
+          "cancelled"
+        ],
+        "title": "ProjectStatus",
+        "type": "string"
+      },
+      "ProjectTree": {
+        "properties": {
+          "modules": {
+            "items": {
+              "$ref": "#/components/schemas/ModuleWithAssemblies"
+            },
+            "title": "Modules",
+            "type": "array"
+          },
+          "project": {
+            "$ref": "#/components/schemas/ProjectListItem"
+          }
+        },
+        "required": [
+          "project",
+          "modules"
+        ],
+        "title": "ProjectTree",
+        "type": "object"
+      },
+      "ProjectUpdate": {
+        "properties": {
+          "client_name": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Name"
+          },
+          "client_po_ref": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Po Ref"
+          },
+          "division_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Division Id"
+          },
+          "due_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due Date"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 5000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "project_manager_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Manager Id"
+          },
+          "row_version": {
+            "title": "Row Version",
+            "type": "integer"
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Date"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProjectStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "row_version"
+        ],
+        "title": "ProjectUpdate",
         "type": "object"
       },
       "ResetPasswordIn": {
@@ -1152,6 +2564,30 @@
           "data_dir"
         ],
         "title": "SetupStatus",
+        "type": "object"
+      },
+      "StageTemplateOut": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_default": {
+            "title": "Is Default",
+            "type": "boolean"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "is_default"
+        ],
+        "title": "StageTemplateOut",
         "type": "object"
       },
       "TokenOut": {
@@ -1519,6 +2955,147 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/assemblies/{assembly_id}": {
+      "delete": {
+        "operationId": "delete_assembly_api_assemblies__assembly_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "assembly_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Assembly Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "row_version the client last saw (409 if stale)",
+            "in": "query",
+            "name": "row_version",
+            "required": true,
+            "schema": {
+              "description": "row_version the client last saw (409 if stale)",
+              "minimum": 1,
+              "title": "Row Version",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete an assembly",
+        "tags": [
+          "org"
+        ]
+      },
+      "get": {
+        "operationId": "get_assembly_api_assemblies__assembly_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "assembly_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Assembly Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssemblyOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get an assembly",
+        "tags": [
+          "org"
+        ]
+      },
+      "patch": {
+        "description": "Drawing and KiCad file ids must be files attached to this assembly.",
+        "operationId": "update_assembly_api_assemblies__assembly_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "assembly_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Assembly Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssemblyUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssemblyOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Edit an assembly",
+        "tags": [
+          "org"
+        ]
+      }
+    },
     "/api/audit": {
       "get": {
         "operationId": "list_audit_api_audit_get",
@@ -1842,6 +3419,31 @@
         ]
       }
     },
+    "/api/directory/users": {
+      "get": {
+        "operationId": "directory_api_directory_users_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DirectoryUser"
+                  },
+                  "title": "Response Directory Api Directory Users Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Active staff for pickers",
+        "tags": [
+          "org"
+        ]
+      }
+    },
     "/api/divisions": {
       "get": {
         "operationId": "list_divisions_api_divisions_get",
@@ -1865,6 +3467,377 @@
         "tags": [
           "org"
         ]
+      },
+      "post": {
+        "operationId": "create_division_api_divisions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DivisionCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DivisionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create a division",
+        "tags": [
+          "org"
+        ]
+      }
+    },
+    "/api/divisions/{division_id}": {
+      "delete": {
+        "operationId": "delete_division_api_divisions__division_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "division_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Division Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "row_version the client last saw (409 if stale)",
+            "in": "query",
+            "name": "row_version",
+            "required": true,
+            "schema": {
+              "description": "row_version the client last saw (409 if stale)",
+              "minimum": 1,
+              "title": "Row Version",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete an empty division",
+        "tags": [
+          "org"
+        ]
+      },
+      "patch": {
+        "operationId": "update_division_api_divisions__division_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "division_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Division Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DivisionUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DivisionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Edit a division",
+        "tags": [
+          "org"
+        ]
+      }
+    },
+    "/api/files": {
+      "get": {
+        "operationId": "list_files_api_files_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "ref_type",
+            "required": true,
+            "schema": {
+              "maxLength": 64,
+              "title": "Ref Type",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "ref_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Ref Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AttachmentOut"
+                  },
+                  "title": "Response List Files Api Files Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Files attached to a record",
+        "tags": [
+          "attachments"
+        ]
+      },
+      "post": {
+        "operationId": "upload_api_files_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_api_files_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttachmentOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Attach a file to a record",
+        "tags": [
+          "attachments"
+        ]
+      }
+    },
+    "/api/files/{file_id}": {
+      "delete": {
+        "operationId": "delete_api_files__file_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "file_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "File Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "row_version",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "title": "Row Version",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete an attachment",
+        "tags": [
+          "attachments"
+        ]
+      },
+      "get": {
+        "operationId": "get_file_api_files__file_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "file_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "File Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttachmentOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "File details",
+        "tags": [
+          "attachments"
+        ]
+      }
+    },
+    "/api/files/{file_id}/content": {
+      "get": {
+        "operationId": "content_api_files__file_id__content_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "file_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "File Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "disposition",
+            "required": false,
+            "schema": {
+              "default": "attachment",
+              "enum": [
+                "attachment",
+                "inline"
+              ],
+              "title": "Disposition",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Download or preview a file",
+        "tags": [
+          "attachments"
+        ]
       }
     },
     "/api/health": {
@@ -1886,6 +3859,203 @@
         "summary": "System health",
         "tags": [
           "system"
+        ]
+      }
+    },
+    "/api/modules/{module_id}": {
+      "delete": {
+        "operationId": "delete_module_api_modules__module_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "module_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Module Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "row_version the client last saw (409 if stale)",
+            "in": "query",
+            "name": "row_version",
+            "required": true,
+            "schema": {
+              "description": "row_version the client last saw (409 if stale)",
+              "minimum": 1,
+              "title": "Row Version",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete a module without assemblies",
+        "tags": [
+          "org"
+        ]
+      },
+      "patch": {
+        "operationId": "update_module_api_modules__module_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "module_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Module Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModuleUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModuleOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Edit a module",
+        "tags": [
+          "org"
+        ]
+      }
+    },
+    "/api/modules/{module_id}/assemblies": {
+      "get": {
+        "operationId": "list_assemblies_api_modules__module_id__assemblies_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "module_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Module Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AssemblyOut"
+                  },
+                  "title": "Response List Assemblies Api Modules  Module Id  Assemblies Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Assemblies of a module",
+        "tags": [
+          "org"
+        ]
+      },
+      "post": {
+        "operationId": "create_assembly_api_modules__module_id__assemblies_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "module_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Module Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssemblyCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssemblyOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add a PCB assembly",
+        "tags": [
+          "org"
         ]
       }
     },
@@ -1923,6 +4093,7 @@
             "schema": {
               "anyOf": [
                 {
+                  "maxLength": 100,
                   "type": "string"
                 },
                 {
@@ -1933,6 +4104,7 @@
             }
           },
           {
+            "description": "Comma-separated statuses",
             "in": "query",
             "name": "status",
             "required": false,
@@ -1945,6 +4117,7 @@
                   "type": "null"
                 }
               ],
+              "description": "Comma-separated statuses",
               "title": "Status"
             }
           },
@@ -1967,6 +4140,40 @@
           },
           {
             "in": "query",
+            "name": "project_manager_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Project Manager Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "client",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Client"
+            }
+          },
+          {
+            "in": "query",
             "name": "q",
             "required": false,
             "schema": {
@@ -1980,6 +4187,50 @@
                 }
               ],
               "title": "Q"
+            }
+          },
+          {
+            "in": "query",
+            "name": "due_after",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Due After"
+            }
+          },
+          {
+            "in": "query",
+            "name": "due_before",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Due Before"
+            }
+          },
+          {
+            "in": "query",
+            "name": "overdue",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Overdue",
+              "type": "boolean"
             }
           }
         ],
@@ -2009,9 +4260,95 @@
         "tags": [
           "org"
         ]
+      },
+      "post": {
+        "description": "The project code comes from document numbering (e.g. PRJ-2026-0004).",
+        "operationId": "create_project_api_projects_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create a project",
+        "tags": [
+          "org"
+        ]
       }
     },
     "/api/projects/{project_id}": {
+      "delete": {
+        "operationId": "delete_project_api_projects__project_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "row_version the client last saw (409 if stale)",
+            "in": "query",
+            "name": "row_version",
+            "required": true,
+            "schema": {
+              "description": "row_version the client last saw (409 if stale)",
+              "minimum": 1,
+              "title": "Row Version",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete a project without modules",
+        "tags": [
+          "org"
+        ]
+      },
       "get": {
         "operationId": "get_project_api_projects__project_id__get",
         "parameters": [
@@ -2026,6 +4363,57 @@
             }
           }
         ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectListItem"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get a project",
+        "tags": [
+          "org"
+        ]
+      },
+      "patch": {
+        "operationId": "update_project_api_projects__project_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectUpdate"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "content": {
@@ -2048,7 +4436,249 @@
             "description": "Validation Error"
           }
         },
-        "summary": "Get a project",
+        "summary": "Edit a project",
+        "tags": [
+          "org"
+        ]
+      }
+    },
+    "/api/projects/{project_id}/clone": {
+      "post": {
+        "description": "Copies modules and assemblies (with drawing and KiCad file links) and, with\n`include_boq`, each BOQ's current revision as a new draft revision A.",
+        "operationId": "clone_project_api_projects__project_id__clone_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectClone"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Clone for a repeat order",
+        "tags": [
+          "org"
+        ]
+      }
+    },
+    "/api/projects/{project_id}/history": {
+      "get": {
+        "operationId": "project_history_api_projects__project_id__history_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/HistoryEntry"
+                  },
+                  "title": "Response Project History Api Projects  Project Id  History Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Change history of a project",
+        "tags": [
+          "org"
+        ]
+      }
+    },
+    "/api/projects/{project_id}/modules": {
+      "get": {
+        "operationId": "list_modules_api_projects__project_id__modules_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ModuleOut"
+                  },
+                  "title": "Response List Modules Api Projects  Project Id  Modules Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Modules of a project",
+        "tags": [
+          "org"
+        ]
+      },
+      "post": {
+        "operationId": "create_module_api_projects__project_id__modules_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModuleCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModuleOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add a module",
+        "tags": [
+          "org"
+        ]
+      }
+    },
+    "/api/projects/{project_id}/tree": {
+      "get": {
+        "operationId": "project_tree_api_projects__project_id__tree_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectTree"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Project with modules and assemblies",
         "tags": [
           "org"
         ]
@@ -2325,6 +4955,31 @@
         "summary": "First-run status",
         "tags": [
           "settings"
+        ]
+      }
+    },
+    "/api/stage-templates": {
+      "get": {
+        "operationId": "stage_templates_api_stage_templates_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/StageTemplateOut"
+                  },
+                  "title": "Response Stage Templates Api Stage Templates Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Production stage templates",
+        "tags": [
+          "org"
         ]
       }
     },

@@ -105,7 +105,7 @@ async function parse<T>(resp: Response): Promise<T> {
   return body as T;
 }
 
-export async function apiRequest<T>(method: string, path: string, opts: RequestOptions = {}): Promise<T> {
+async function sendWithRenewal(method: string, path: string, opts: RequestOptions): Promise<Response> {
   let resp = await send(method, path, opts, accessToken);
   if (resp.status === 401 && !opts.anonymous) {
     const code = await resp
@@ -126,7 +126,19 @@ export async function apiRequest<T>(method: string, path: string, opts: RequestO
     const peek = await resp.clone().json().catch(() => null);
     if (isApiErrorBody(peek) && peek.error.code === "password_change_required") emit("password_change_required");
   }
-  return parse<T>(resp);
+  return resp;
+}
+
+export async function apiRequest<T>(method: string, path: string, opts: RequestOptions = {}): Promise<T> {
+  return parse<T>(await sendWithRenewal(method, path, opts));
+}
+
+/** Authenticated binary download (file previews and downloads need the bearer token,
+ *  which a plain link cannot send). */
+export async function apiBlob(path: string, signal?: AbortSignal): Promise<Blob> {
+  const resp = await sendWithRenewal("GET", path, { signal });
+  if (!resp.ok) await parse<never>(resp);
+  return resp.blob();
 }
 
 export const apiGet = <T>(path: string, signal?: AbortSignal) => apiRequest<T>("GET", path, { signal });

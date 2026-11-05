@@ -28,17 +28,39 @@ interface FieldProps {
   children: React.ReactNode;
 }
 
+interface FieldControlProps {
+  id?: string;
+  "aria-describedby"?: string;
+  "aria-invalid"?: React.AriaAttributes["aria-invalid"];
+  "aria-required"?: React.AriaAttributes["aria-required"];
+}
+
+const FieldContext = React.createContext<FieldControlProps | null>(null);
+
+/** Controls call this so a surrounding <Field> wires id, description and error state even
+ *  when they are nested (e.g. inside react-hook-form's Controller). Explicit props win. */
+export function useFieldControl<P extends FieldControlProps>(props: P): P {
+  const ctx = React.useContext(FieldContext);
+  if (!ctx) return props;
+  return {
+    ...props,
+    id: props.id ?? ctx.id,
+    "aria-describedby": props["aria-describedby"] ?? ctx["aria-describedby"],
+    "aria-invalid": props["aria-invalid"] ?? ctx["aria-invalid"],
+    "aria-required": props["aria-required"] ?? ctx["aria-required"],
+  };
+}
+
 /** Label + control + hint/error, wired with aria-describedby. */
 export function Field({ label, htmlFor, hint, error, required, className, children }: FieldProps) {
   const describedBy = error ? `${htmlFor}-error` : hint ? `${htmlFor}-hint` : undefined;
-  const control = React.isValidElement<Record<string, unknown>>(children)
-    ? React.cloneElement(children, {
-        id: htmlFor,
-        "aria-describedby": describedBy,
-        "aria-invalid": error ? true : undefined,
-        "aria-required": required || undefined,
-      })
-    : children;
+  const control = (
+    <FieldContext.Provider
+      value={{ id: htmlFor, "aria-describedby": describedBy, "aria-invalid": error ? true : undefined, "aria-required": required || undefined }}
+    >
+      {children}
+    </FieldContext.Provider>
+  );
   return (
     <div className={cn("flex flex-col gap-1.5", className)}>
       <Label htmlFor={htmlFor}>

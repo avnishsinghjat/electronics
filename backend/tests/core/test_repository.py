@@ -142,6 +142,7 @@ async def test_api_returns_409_on_stale_row_version(
             obj = await repo.update(
                 await repo.get(division_id), {"name": body.name}, expected_version=body.row_version
             )
+            await session.commit()
             return {"name": obj.name, "row_version": obj.row_version}
         raise AssertionError
 

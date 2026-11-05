@@ -96,9 +96,10 @@ describe("Role-aware navigation", () => {
   const viewer = makeMe({ id: "u-v", username: "client", full_name: "Client Viewer", roles: ["viewer"], permissions: ["projects:read", "reports:read_issued"] });
 
   it("a client viewer sees only Projects and Reports and lands on Projects", async () => {
-    mockApi(signedInRoutes(viewer));
+    mockApi(signedInRoutes(viewer, { "GET /divisions": () => [], "GET /projects": () => ({ items: [], total: 0, page: 1, page_size: 500 }) }));
     const router = renderAt("/");
-    expect(await screen.findByRole("heading", { name: "Projects is delivered in Phase 4" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "Projects" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "New project" })).not.toBeInTheDocument();
     expect(router.state.location.pathname).toBe("/projects");
     const nav = screen.getByRole("navigation", { name: "Main navigation" });
     expect(within(nav).getAllByRole("link").map((a) => a.textContent)).toEqual(["Projects", "Reports"]);

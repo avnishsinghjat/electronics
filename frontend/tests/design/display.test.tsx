@@ -299,3 +299,12 @@ describe("PhotoGrid", () => {
     expect(screen.getByText("No evidence yet")).toBeInTheDocument();
   });
 });
+
+describe("Layering", () => {
+  it("popovers stack above modals (they open from inside drawers and dialogs)", async () => {
+    const { zIndex } = await import("@/design/tokens");
+    expect(zIndex.dropdown).toBeGreaterThan(zIndex.modal);
+    expect(zIndex.modal).toBeGreaterThan(zIndex.overlay);
+    expect(zIndex.tooltip).toBeGreaterThan(zIndex.dropdown);
+  });
+});

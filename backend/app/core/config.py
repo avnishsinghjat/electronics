@@ -40,6 +40,9 @@ class Settings(BaseSettings):
     lockout_minutes: int = Field(default=15, ge=1)
     min_password_length: int = Field(default=10, ge=8)
 
+    # Attachments: largest accepted upload (photos, PDFs, zipped KiCad projects).
+    max_upload_mb: int = Field(default=100, ge=1, le=2048)
+
     @model_validator(mode="after")
     def _production_needs_secret(self) -> "Settings":
         weak = self.secret_key == DEV_SECRET or len(self.secret_key) < 32
