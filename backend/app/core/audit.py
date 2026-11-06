@@ -30,6 +30,8 @@ class AuditAction(enum.StrEnum):
     LOGIN_FAILED = "login_failed"
     LOCKED = "locked"
     LOGOUT = "logout"
+    # Business events that need a reason on record.
+    RELEASE_OVERRIDE = "release_override"
 
 
 class AuditLog(Base):

@@ -129,6 +129,7 @@ async def company(
         company_name=c.company_name,
         address=c.address,
         gstin=c.gstin,
+        serial_prefix=c.serial_prefix,
         has_logo=c.logo_file_id is not None,
         row_version=c.row_version,
     )
@@ -145,6 +146,7 @@ async def update_company(
         company_name=c.company_name,
         address=c.address,
         gstin=c.gstin,
+        serial_prefix=c.serial_prefix,
         has_logo=c.logo_file_id is not None,
         row_version=c.row_version,
     )

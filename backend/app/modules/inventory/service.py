@@ -709,3 +709,82 @@ async def release_reservation(
     await session.flush()
     await session.commit()
     return r
+
+
+async def lot_stock(
+    session: AsyncSession, part_id: uuid.UUID
+) -> list[tuple[InventoryLocation, str | None, Decimal]]:
+    """Usable stock of a part by location and lot (from the ledger), for picking a kit."""
+    rows = await session.execute(
+        select(InventoryLocation, LedgerEntry.lot_code, func.sum(LedgerEntry.qty_delta))
+        .join(InventoryLocation, InventoryLocation.id == LedgerEntry.location_id)
+        .where(LedgerEntry.part_id == part_id, InventoryLocation.kind.in_(USABLE_KINDS))
+        .group_by(InventoryLocation.id, LedgerEntry.lot_code)
+        .having(func.sum(LedgerEntry.qty_delta) > 0)
+        .order_by(InventoryLocation.code, LedgerEntry.lot_code)
+    )
+    return [(loc, lot, Decimal(q)) for loc, lot, q in rows.all()]
+
+
+async def lot_on_hand(
+    session: AsyncSession, part_id: uuid.UUID, location_id: uuid.UUID, lot_code: str | None
+) -> Decimal:
+    stmt = select(func.coalesce(func.sum(LedgerEntry.qty_delta), 0)).where(
+        LedgerEntry.part_id == part_id, LedgerEntry.location_id == location_id
+    )
+    stmt = stmt.where(
+        LedgerEntry.lot_code.is_(None) if lot_code is None else LedgerEntry.lot_code == lot_code
+    )
+    return Decimal((await session.execute(stmt)).scalar_one())
+
+
+async def consume_reservations(
+    session: AsyncSession, *, part_id: uuid.UUID, project_id: uuid.UUID, qty: Decimal
+) -> Decimal:
+    """Use up a project's reservations of a part, oldest first, when stock is issued to
+    it. Returns the quantity that was covered by reservations."""
+    rows = (
+        (
+            await session.execute(
+                select(StockReservation)
+                .where(
+                    StockReservation.part_id == part_id,
+                    StockReservation.project_id == project_id,
+                    StockReservation.status == ReservationStatus.ACTIVE.value,
+                    StockReservation.is_deleted.is_(False),
+                )
+                .order_by(StockReservation.created_at)
+                .with_for_update()
+            )
+        )
+        .scalars()
+        .all()
+    )
+    left = qty
+    for r in rows:
+        if left <= 0:
+            break
+        if r.qty <= left:
+            left -= r.qty
+            r.status = ReservationStatus.CONSUMED.value
+        else:
+            r.qty -= left
+            left = Decimal(0)
+    await session.flush()
+    return qty - left
+
+
+async def project_reserved(
+    session: AsyncSession, part_id: uuid.UUID, project_id: uuid.UUID
+) -> Decimal:
+    total = (
+        await session.execute(
+            select(func.coalesce(func.sum(StockReservation.qty), 0)).where(
+                StockReservation.part_id == part_id,
+                StockReservation.project_id == project_id,
+                StockReservation.status == ReservationStatus.ACTIVE.value,
+                StockReservation.is_deleted.is_(False),
+            )
+        )
+    ).scalar_one()
+    return Decimal(total)

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{{ wo_number }} labels</title>
+<style>
+  @font-face { font-family: "Inter"; src: url("fonts/inter-latin-wght-normal.woff2"); font-weight: 100 900; }
+  @font-face { font-family: "JetBrains Mono"; src: url("fonts/jetbrains-mono-latin-wght-normal.woff2"); font-weight: 100 800; }
+  /* 3 x 8 labels of 70 x 37 mm on A4 (common label stock). */
+  @page { size: A4; margin: 0; }
+  body { margin: 0; font-family: "Inter", sans-serif; }
+  .sheet { display: grid; grid-template-columns: repeat(3, 70mm); grid-auto-rows: 37.125mm; page-break-after: always; }
+  .sheet:last-child { page-break-after: auto; }
+  .label { box-sizing: border-box; padding: 3mm; display: flex; gap: 2.5mm; align-items: center; overflow: hidden; }
+  .label img { width: 26mm; height: 26mm; flex: none; }
+  .text { min-width: 0; }
+  .sn { font-family: "JetBrains Mono", monospace; font-size: 8.5pt; font-weight: 700; word-break: break-all; }
+  .meta { font-size: 6.5pt; color: #344054; margin-top: 1mm; line-height: 1.35; }
+</style>
+</head>
+<body>
+{% for page in pages %}
+<div class="sheet">
+  {% for u in page %}
+  <div class="label">
+    <img src="{{ u.qr }}" alt="">
+    <div class="text">
+      <div class="sn">{{ u.serial }}</div>
+      <div class="meta">{{ assembly }}<br>{{ wo_number }} · {{ lot_number }}<br>{{ company }}</div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endfor %}
+</body>
+</html>

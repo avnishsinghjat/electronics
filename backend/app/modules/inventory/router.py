@@ -16,6 +16,7 @@ from app.modules.inventory.schemas import (
     LedgerPage,
     LedgerRow,
     LocationOut,
+    LotStockOut,
     PartStock,
     ReservationIn,
     ReservationOut,
@@ -293,3 +294,14 @@ async def release(
 ) -> ReservationOut:
     r = await service.release_reservation(session, user, reservation_id, data.row_version)
     return (await _reservation_outs(session, user, [r]))[0]
+
+
+@router.get(
+    "/lots", response_model=list[LotStockOut], summary="Usable stock of a part by location and lot"
+)
+async def lots(part_id: uuid.UUID, user: Reader, session: SessionDep) -> list[LotStockOut]:
+    user.require("inventory:read")
+    return [
+        LotStockOut(location_id=loc.id, location_code=loc.code, lot_code=lot, qty=qty)
+        for loc, lot, qty in await service.lot_stock(session, part_id)
+    ]

@@ -839,7 +839,8 @@
           "login",
           "login_failed",
           "locked",
-          "logout"
+          "logout",
+          "release_override"
         ],
         "title": "AuditAction",
         "type": "string"
@@ -997,6 +998,128 @@
           "page_size"
         ],
         "title": "AuditPage",
+        "type": "object"
+      },
+      "BoardCard": {
+        "properties": {
+          "assembly_label": {
+            "title": "Assembly Label",
+            "type": "string"
+          },
+          "awaiting_qc": {
+            "title": "Awaiting Qc",
+            "type": "integer"
+          },
+          "build_qty": {
+            "title": "Build Qty",
+            "type": "integer"
+          },
+          "number": {
+            "title": "Number",
+            "type": "string"
+          },
+          "planned_end": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned End"
+          },
+          "project_code": {
+            "title": "Project Code",
+            "type": "string"
+          },
+          "stage_count": {
+            "title": "Stage Count",
+            "type": "integer"
+          },
+          "stage_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stage Name"
+          },
+          "stage_seq": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stage Seq"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "units_at_stage": {
+            "title": "Units At Stage",
+            "type": "integer"
+          },
+          "units_done_at_stage": {
+            "title": "Units Done At Stage",
+            "type": "integer"
+          },
+          "work_order_id": {
+            "format": "uuid",
+            "title": "Work Order Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "work_order_id",
+          "number",
+          "project_code",
+          "assembly_label",
+          "build_qty",
+          "status",
+          "stage_name",
+          "stage_seq",
+          "stage_count",
+          "units_at_stage",
+          "units_done_at_stage",
+          "awaiting_qc",
+          "planned_end"
+        ],
+        "title": "BoardCard",
+        "type": "object"
+      },
+      "BoardColumn": {
+        "properties": {
+          "cards": {
+            "items": {
+              "$ref": "#/components/schemas/BoardCard"
+            },
+            "title": "Cards",
+            "type": "array"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "cards"
+        ],
+        "title": "BoardColumn",
         "type": "object"
       },
       "Body_start_import_api_boqs__boq_id__imports_post": {
@@ -1415,12 +1538,17 @@
           "row_version": {
             "title": "Row Version",
             "type": "integer"
+          },
+          "serial_prefix": {
+            "title": "Serial Prefix",
+            "type": "string"
           }
         },
         "required": [
           "company_name",
           "address",
           "gstin",
+          "serial_prefix",
           "has_logo",
           "row_version"
         ],
@@ -1462,6 +1590,12 @@
           "row_version": {
             "title": "Row Version",
             "type": "integer"
+          },
+          "serial_prefix": {
+            "default": "SN",
+            "pattern": "^[A-Z0-9]{1,8}$",
+            "title": "Serial Prefix",
+            "type": "string"
           }
         },
         "required": [
@@ -1961,6 +2095,103 @@
           "sha256"
         ],
         "title": "FileRef",
+        "type": "object"
+      },
+      "Genealogy": {
+        "properties": {
+          "assembly_label": {
+            "title": "Assembly Label",
+            "type": "string"
+          },
+          "lot_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lot Number"
+          },
+          "parts": {
+            "items": {
+              "$ref": "#/components/schemas/GenealogyPart"
+            },
+            "title": "Parts",
+            "type": "array"
+          },
+          "serial_number": {
+            "title": "Serial Number",
+            "type": "string"
+          },
+          "work_order_id": {
+            "format": "uuid",
+            "title": "Work Order Id",
+            "type": "string"
+          },
+          "work_order_number": {
+            "title": "Work Order Number",
+            "type": "string"
+          }
+        },
+        "required": [
+          "serial_number",
+          "work_order_id",
+          "work_order_number",
+          "lot_number",
+          "assembly_label",
+          "parts"
+        ],
+        "title": "Genealogy",
+        "type": "object"
+      },
+      "GenealogyPart": {
+        "properties": {
+          "boq_line_id": {
+            "format": "uuid",
+            "title": "Boq Line Id",
+            "type": "string"
+          },
+          "lot_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lot Code"
+          },
+          "mpn": {
+            "title": "Mpn",
+            "type": "string"
+          },
+          "qty": {
+            "title": "Qty",
+            "type": "string"
+          },
+          "ref_des": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ref Des"
+          }
+        },
+        "required": [
+          "boq_line_id",
+          "ref_des",
+          "mpn",
+          "lot_code",
+          "qty"
+        ],
+        "title": "GenealogyPart",
         "type": "object"
       },
       "GrnCreate": {
@@ -3009,6 +3240,324 @@
         "title": "ImportOut",
         "type": "object"
       },
+      "KitBatchIn": {
+        "properties": {
+          "issues": {
+            "items": {
+              "$ref": "#/components/schemas/KitIssueIn"
+            },
+            "maxItems": 500,
+            "minItems": 1,
+            "title": "Issues",
+            "type": "array"
+          }
+        },
+        "required": [
+          "issues"
+        ],
+        "title": "KitBatchIn",
+        "type": "object"
+      },
+      "KitIssueIn": {
+        "properties": {
+          "boq_line_id": {
+            "format": "uuid",
+            "title": "Boq Line Id",
+            "type": "string"
+          },
+          "location_id": {
+            "format": "uuid",
+            "title": "Location Id",
+            "type": "string"
+          },
+          "lot_code": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lot Code"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "qty": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Qty"
+          }
+        },
+        "required": [
+          "boq_line_id",
+          "location_id",
+          "qty"
+        ],
+        "title": "KitIssueIn",
+        "type": "object"
+      },
+      "KitLine": {
+        "properties": {
+          "available": {
+            "title": "Available",
+            "type": "string"
+          },
+          "boq_line_id": {
+            "format": "uuid",
+            "title": "Boq Line Id",
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "dnp": {
+            "title": "Dnp",
+            "type": "boolean"
+          },
+          "issued": {
+            "title": "Issued",
+            "type": "string"
+          },
+          "line_no": {
+            "title": "Line No",
+            "type": "integer"
+          },
+          "mpn": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mpn"
+          },
+          "part_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Part Id"
+          },
+          "ref_des": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ref Des"
+          },
+          "required": {
+            "title": "Required",
+            "type": "string"
+          },
+          "reserved_for_project": {
+            "title": "Reserved For Project",
+            "type": "string"
+          },
+          "shortage": {
+            "title": "Shortage",
+            "type": "string"
+          },
+          "unit": {
+            "title": "Unit",
+            "type": "string"
+          }
+        },
+        "required": [
+          "boq_line_id",
+          "line_no",
+          "ref_des",
+          "part_id",
+          "mpn",
+          "description",
+          "unit",
+          "dnp",
+          "required",
+          "issued",
+          "shortage",
+          "available",
+          "reserved_for_project"
+        ],
+        "title": "KitLine",
+        "type": "object"
+      },
+      "KitOut": {
+        "properties": {
+          "boq_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Boq Id"
+          },
+          "boq_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Boq Name"
+          },
+          "complete": {
+            "title": "Complete",
+            "type": "boolean"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/KitLine"
+            },
+            "title": "Lines",
+            "type": "array"
+          },
+          "revision": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revision"
+          }
+        },
+        "required": [
+          "boq_id",
+          "boq_name",
+          "revision",
+          "lines",
+          "complete"
+        ],
+        "title": "KitOut",
+        "type": "object"
+      },
+      "KitRecord": {
+        "properties": {
+          "boq_line_id": {
+            "format": "uuid",
+            "title": "Boq Line Id",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "created_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By Name"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "location_code": {
+            "title": "Location Code",
+            "type": "string"
+          },
+          "lot_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lot Code"
+          },
+          "mpn": {
+            "title": "Mpn",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "qty": {
+            "title": "Qty",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "boq_line_id",
+          "mpn",
+          "location_code",
+          "lot_code",
+          "qty",
+          "note",
+          "created_at",
+          "created_by_name"
+        ],
+        "title": "KitRecord",
+        "type": "object"
+      },
       "LedgerPage": {
         "properties": {
           "items": {
@@ -3684,6 +4233,42 @@
           "password"
         ],
         "title": "LoginRequest",
+        "type": "object"
+      },
+      "LotStockOut": {
+        "properties": {
+          "location_code": {
+            "title": "Location Code",
+            "type": "string"
+          },
+          "location_id": {
+            "format": "uuid",
+            "title": "Location Id",
+            "type": "string"
+          },
+          "lot_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lot Code"
+          },
+          "qty": {
+            "title": "Qty",
+            "type": "string"
+          }
+        },
+        "required": [
+          "location_id",
+          "location_code",
+          "lot_code",
+          "qty"
+        ],
+        "title": "LotStockOut",
         "type": "object"
       },
       "MappingIn": {
@@ -5925,6 +6510,200 @@
         "title": "PrUpdate",
         "type": "object"
       },
+      "ProgressIn": {
+        "description": "Lot tracking: qty_passed/qty_failed when completing. Serial tracking: passed.",
+        "properties": {
+          "action": {
+            "pattern": "^(start|finish|complete)$",
+            "title": "Action",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "passed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Passed"
+          },
+          "qty_failed": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Qty Failed"
+          },
+          "qty_passed": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Qty Passed"
+          },
+          "serial_unit_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Serial Unit Id"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "title": "ProgressIn",
+        "type": "object"
+      },
+      "ProgressOut": {
+        "properties": {
+          "completed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "operator_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Operator Name"
+          },
+          "qty_failed": {
+            "title": "Qty Failed",
+            "type": "integer"
+          },
+          "qty_passed": {
+            "title": "Qty Passed",
+            "type": "integer"
+          },
+          "seq": {
+            "title": "Seq",
+            "type": "integer"
+          },
+          "serial_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Serial Number"
+          },
+          "serial_unit_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Serial Unit Id"
+          },
+          "stage_name": {
+            "title": "Stage Name",
+            "type": "string"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "work_order_stage_id": {
+            "format": "uuid",
+            "title": "Work Order Stage Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "work_order_stage_id",
+          "stage_name",
+          "seq",
+          "serial_unit_id",
+          "serial_number",
+          "status",
+          "started_at",
+          "completed_at",
+          "qty_passed",
+          "qty_failed",
+          "operator_name",
+          "notes"
+        ],
+        "title": "ProgressOut",
+        "type": "object"
+      },
       "ProjectClone": {
         "properties": {
           "client_po_ref": {
@@ -6533,6 +7312,66 @@
         "title": "ProjectUpdate",
         "type": "object"
       },
+      "Readiness": {
+        "properties": {
+          "clear_to_build": {
+            "title": "Clear To Build",
+            "type": "boolean"
+          },
+          "lines": {
+            "title": "Lines",
+            "type": "integer"
+          },
+          "lines_received": {
+            "title": "Lines Received",
+            "type": "integer"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "required": [
+          "clear_to_build",
+          "reason",
+          "lines",
+          "lines_received"
+        ],
+        "title": "Readiness",
+        "type": "object"
+      },
+      "ReleaseIn": {
+        "properties": {
+          "override_reason": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Override Reason"
+          },
+          "row_version": {
+            "title": "Row Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "row_version"
+        ],
+        "title": "ReleaseIn",
+        "type": "object"
+      },
       "ReservationIn": {
         "properties": {
           "location_id": {
@@ -6983,6 +7822,94 @@
         "title": "RoleInfo",
         "type": "object"
       },
+      "ScanResult": {
+        "properties": {
+          "next_action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Action"
+          },
+          "serial_number": {
+            "title": "Serial Number",
+            "type": "string"
+          },
+          "serial_unit_id": {
+            "format": "uuid",
+            "title": "Serial Unit Id",
+            "type": "string"
+          },
+          "stage": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProgressOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "stage_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stage Id"
+          },
+          "stage_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stage Name"
+          },
+          "stage_requires_qc": {
+            "title": "Stage Requires Qc",
+            "type": "boolean"
+          },
+          "unit_status": {
+            "title": "Unit Status",
+            "type": "string"
+          },
+          "work_order_id": {
+            "format": "uuid",
+            "title": "Work Order Id",
+            "type": "string"
+          },
+          "work_order_number": {
+            "title": "Work Order Number",
+            "type": "string"
+          }
+        },
+        "required": [
+          "serial_unit_id",
+          "serial_number",
+          "work_order_id",
+          "work_order_number",
+          "unit_status",
+          "stage",
+          "stage_id",
+          "stage_name",
+          "stage_requires_qc",
+          "next_action"
+        ],
+        "title": "ScanResult",
+        "type": "object"
+      },
       "ScopeIn": {
         "properties": {
           "scope_id": {
@@ -7027,6 +7954,25 @@
         ],
         "title": "ScopeType",
         "type": "string"
+      },
+      "SerialsIn": {
+        "properties": {
+          "count": {
+            "anyOf": [
+              {
+                "maximum": 10000.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Count"
+          }
+        },
+        "title": "SerialsIn",
+        "type": "object"
       },
       "SetupAdmin": {
         "properties": {
@@ -7107,6 +8053,85 @@
         "title": "SetupStatus",
         "type": "object"
       },
+      "StageCode": {
+        "enum": [
+          "kitting",
+          "smt",
+          "reflow",
+          "aoi",
+          "tht",
+          "wave_solder",
+          "hand_solder",
+          "cleaning",
+          "conformal_coat",
+          "programming",
+          "functional_test",
+          "final_assembly",
+          "packing",
+          "custom"
+        ],
+        "title": "StageCode",
+        "type": "string"
+      },
+      "StageSummary": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "requires_qc": {
+            "title": "Requires Qc",
+            "type": "boolean"
+          },
+          "seq": {
+            "title": "Seq",
+            "type": "integer"
+          },
+          "stage_code": {
+            "title": "Stage Code",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "units_awaiting_qc": {
+            "title": "Units Awaiting Qc",
+            "type": "integer"
+          },
+          "units_done": {
+            "title": "Units Done",
+            "type": "integer"
+          },
+          "units_failed": {
+            "title": "Units Failed",
+            "type": "integer"
+          },
+          "units_in": {
+            "title": "Units In",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "seq",
+          "stage_code",
+          "name",
+          "requires_qc",
+          "status",
+          "units_in",
+          "units_done",
+          "units_failed",
+          "units_awaiting_qc"
+        ],
+        "title": "StageSummary",
+        "type": "object"
+      },
       "StageTemplateOut": {
         "properties": {
           "id": {
@@ -7129,6 +8154,64 @@
           "is_default"
         ],
         "title": "StageTemplateOut",
+        "type": "object"
+      },
+      "StepIn": {
+        "properties": {
+          "name": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "requires_qc": {
+            "default": false,
+            "title": "Requires Qc",
+            "type": "boolean"
+          },
+          "stage_code": {
+            "$ref": "#/components/schemas/StageCode"
+          }
+        },
+        "required": [
+          "stage_code",
+          "name"
+        ],
+        "title": "StepIn",
+        "type": "object"
+      },
+      "StepOut": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "requires_qc": {
+            "title": "Requires Qc",
+            "type": "boolean"
+          },
+          "seq": {
+            "title": "Seq",
+            "type": "integer"
+          },
+          "stage_code": {
+            "title": "Stage Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "seq",
+          "stage_code",
+          "name",
+          "requires_qc"
+        ],
+        "title": "StepOut",
         "type": "object"
       },
       "StockRow": {
@@ -7210,48 +8293,85 @@
         "title": "StockRow",
         "type": "object"
       },
-      "TemplateOut": {
+      "TemplateCreate": {
         "properties": {
-          "client_name": {
+          "copy_from_id": {
             "anyOf": [
               {
+                "format": "uuid",
                 "type": "string"
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Client Name"
+            "title": "Copy From Id"
           },
-          "id": {
-            "format": "uuid",
-            "title": "Id",
-            "type": "string"
-          },
-          "mapping": {
-            "additionalProperties": {
-              "type": "string"
-            },
-            "title": "Mapping",
-            "type": "object"
+          "description": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
           },
           "name": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "TemplateCreate",
+        "type": "object"
+      },
+      "TemplateUpdate": {
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "name": {
+            "maxLength": 120,
+            "minLength": 1,
             "title": "Name",
             "type": "string"
           },
           "row_version": {
             "title": "Row Version",
             "type": "integer"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/StepIn"
+            },
+            "maxItems": 40,
+            "minItems": 1,
+            "title": "Steps",
+            "type": "array"
           }
         },
         "required": [
-          "id",
+          "row_version",
           "name",
-          "client_name",
-          "mapping",
-          "row_version"
+          "steps"
         ],
-        "title": "TemplateOut",
+        "title": "TemplateUpdate",
         "type": "object"
       },
       "TokenOut": {
@@ -7702,6 +8822,67 @@
           "qty"
         ],
         "title": "TransferIn",
+        "type": "object"
+      },
+      "UnitOut": {
+        "properties": {
+          "current_stage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Stage"
+          },
+          "current_stage_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Stage Id"
+          },
+          "current_stage_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Stage Status"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "serial_number": {
+            "title": "Serial Number",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "serial_number",
+          "status",
+          "current_stage",
+          "current_stage_id",
+          "current_stage_status"
+        ],
+        "title": "UnitOut",
         "type": "object"
       },
       "UserCreate": {
@@ -8439,6 +9620,720 @@
           "row_version"
         ],
         "title": "VersionIn",
+        "type": "object"
+      },
+      "WoCreate": {
+        "properties": {
+          "assembly_id": {
+            "format": "uuid",
+            "title": "Assembly Id",
+            "type": "string"
+          },
+          "boq_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Boq Id"
+          },
+          "build_qty": {
+            "maximum": 1000000.0,
+            "minimum": 1.0,
+            "title": "Build Qty",
+            "type": "integer"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 5000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "planned_end": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned End"
+          },
+          "planned_start": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned Start"
+          },
+          "track_serials": {
+            "default": true,
+            "title": "Track Serials",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "assembly_id",
+          "build_qty"
+        ],
+        "title": "WoCreate",
+        "type": "object"
+      },
+      "WoDetail": {
+        "properties": {
+          "assembly_id": {
+            "format": "uuid",
+            "title": "Assembly Id",
+            "type": "string"
+          },
+          "assembly_label": {
+            "title": "Assembly Label",
+            "type": "string"
+          },
+          "boq_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Boq Id"
+          },
+          "build_qty": {
+            "title": "Build Qty",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "current_stage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Stage"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "lot_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lot Id"
+          },
+          "lot_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lot Number"
+          },
+          "module_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Module Code"
+          },
+          "module_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Module Id"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "number": {
+            "title": "Number",
+            "type": "string"
+          },
+          "planned_end": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned End"
+          },
+          "planned_start": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned Start"
+          },
+          "project_code": {
+            "title": "Project Code",
+            "type": "string"
+          },
+          "project_id": {
+            "format": "uuid",
+            "title": "Project Id",
+            "type": "string"
+          },
+          "project_name": {
+            "title": "Project Name",
+            "type": "string"
+          },
+          "readiness": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Readiness"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "release_override_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Release Override Reason"
+          },
+          "released_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Released At"
+          },
+          "row_version": {
+            "title": "Row Version",
+            "type": "integer"
+          },
+          "serial_count": {
+            "title": "Serial Count",
+            "type": "integer"
+          },
+          "stages": {
+            "items": {
+              "$ref": "#/components/schemas/StageSummary"
+            },
+            "title": "Stages",
+            "type": "array"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "track_serials": {
+            "title": "Track Serials",
+            "type": "boolean"
+          },
+          "units_completed": {
+            "title": "Units Completed",
+            "type": "integer"
+          },
+          "units_failed": {
+            "title": "Units Failed",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "number",
+          "project_id",
+          "project_code",
+          "project_name",
+          "module_id",
+          "module_code",
+          "assembly_id",
+          "assembly_label",
+          "boq_id",
+          "build_qty",
+          "status",
+          "planned_start",
+          "planned_end",
+          "released_at",
+          "release_override_reason",
+          "track_serials",
+          "notes",
+          "lot_id",
+          "lot_number",
+          "current_stage",
+          "units_completed",
+          "units_failed",
+          "serial_count",
+          "created_at",
+          "row_version",
+          "stages",
+          "readiness"
+        ],
+        "title": "WoDetail",
+        "type": "object"
+      },
+      "WoOut": {
+        "properties": {
+          "assembly_id": {
+            "format": "uuid",
+            "title": "Assembly Id",
+            "type": "string"
+          },
+          "assembly_label": {
+            "title": "Assembly Label",
+            "type": "string"
+          },
+          "boq_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Boq Id"
+          },
+          "build_qty": {
+            "title": "Build Qty",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "current_stage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Stage"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "lot_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lot Id"
+          },
+          "lot_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lot Number"
+          },
+          "module_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Module Code"
+          },
+          "module_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Module Id"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "number": {
+            "title": "Number",
+            "type": "string"
+          },
+          "planned_end": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned End"
+          },
+          "planned_start": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned Start"
+          },
+          "project_code": {
+            "title": "Project Code",
+            "type": "string"
+          },
+          "project_id": {
+            "format": "uuid",
+            "title": "Project Id",
+            "type": "string"
+          },
+          "project_name": {
+            "title": "Project Name",
+            "type": "string"
+          },
+          "release_override_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Release Override Reason"
+          },
+          "released_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Released At"
+          },
+          "row_version": {
+            "title": "Row Version",
+            "type": "integer"
+          },
+          "serial_count": {
+            "title": "Serial Count",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "track_serials": {
+            "title": "Track Serials",
+            "type": "boolean"
+          },
+          "units_completed": {
+            "title": "Units Completed",
+            "type": "integer"
+          },
+          "units_failed": {
+            "title": "Units Failed",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "number",
+          "project_id",
+          "project_code",
+          "project_name",
+          "module_id",
+          "module_code",
+          "assembly_id",
+          "assembly_label",
+          "boq_id",
+          "build_qty",
+          "status",
+          "planned_start",
+          "planned_end",
+          "released_at",
+          "release_override_reason",
+          "track_serials",
+          "notes",
+          "lot_id",
+          "lot_number",
+          "current_stage",
+          "units_completed",
+          "units_failed",
+          "serial_count",
+          "created_at",
+          "row_version"
+        ],
+        "title": "WoOut",
+        "type": "object"
+      },
+      "WoUpdate": {
+        "properties": {
+          "boq_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Boq Id"
+          },
+          "build_qty": {
+            "maximum": 1000000.0,
+            "minimum": 1.0,
+            "title": "Build Qty",
+            "type": "integer"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 5000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "planned_end": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned End"
+          },
+          "planned_start": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned Start"
+          },
+          "row_version": {
+            "title": "Row Version",
+            "type": "integer"
+          },
+          "track_serials": {
+            "default": true,
+            "title": "Track Serials",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "row_version",
+          "build_qty"
+        ],
+        "title": "WoUpdate",
+        "type": "object"
+      },
+      "app__modules__boq__schemas__TemplateOut": {
+        "properties": {
+          "client_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Name"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "mapping": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Mapping",
+            "type": "object"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "row_version": {
+            "title": "Row Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "client_name",
+          "mapping",
+          "row_version"
+        ],
+        "title": "TemplateOut",
+        "type": "object"
+      },
+      "app__modules__production__schemas__TemplateOut": {
+        "properties": {
+          "assembly_count": {
+            "title": "Assembly Count",
+            "type": "integer"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_default": {
+            "title": "Is Default",
+            "type": "boolean"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "row_version": {
+            "title": "Row Version",
+            "type": "integer"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/StepOut"
+            },
+            "title": "Steps",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "description",
+          "is_default",
+          "assembly_count",
+          "steps",
+          "row_version"
+        ],
+        "title": "TemplateOut",
         "type": "object"
       }
     }
@@ -9190,7 +11085,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "$ref": "#/components/schemas/TemplateOut"
+                    "$ref": "#/components/schemas/app__modules__boq__schemas__TemplateOut"
                   },
                   "title": "Response Templates Api Boq Mapping Templates Get",
                   "type": "array"
@@ -10818,6 +12713,53 @@
         ]
       }
     },
+    "/api/inventory/lots": {
+      "get": {
+        "operationId": "lots_api_inventory_lots_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "part_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Part Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/LotStockOut"
+                  },
+                  "title": "Response Lots Api Inventory Lots Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Usable stock of a part by location and lot",
+        "tags": [
+          "inventory"
+        ]
+      }
+    },
     "/api/inventory/reservations": {
       "get": {
         "operationId": "reservations_api_inventory_reservations_get",
@@ -11560,6 +13502,100 @@
         "summary": "Open PO lines across projects, by expected date",
         "tags": [
           "procurement"
+        ]
+      }
+    },
+    "/api/production/board": {
+      "get": {
+        "operationId": "board_api_production_board_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/BoardColumn"
+                  },
+                  "title": "Response Board Api Production Board Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Work order board by stage",
+        "tags": [
+          "production"
+        ]
+      }
+    },
+    "/api/production/scan": {
+      "get": {
+        "operationId": "scan_api_production_scan_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "maxLength": 64,
+              "minLength": 1,
+              "title": "Code",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScanResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Find a unit by its serial (QR scan)",
+        "tags": [
+          "production"
+        ]
+      }
+    },
+    "/api/production/stage-templates": {
+      "get": {
+        "operationId": "list_templates_api_production_stage_templates_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/app__modules__production__schemas__TemplateOut"
+                  },
+                  "title": "Response List Templates Api Production Stage Templates Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Stage templates with steps",
+        "tags": [
+          "production"
         ]
       }
     },
@@ -13193,6 +15229,49 @@
         ]
       }
     },
+    "/api/serial-units/{unit_id}/genealogy": {
+      "get": {
+        "operationId": "genealogy_api_serial_units__unit_id__genealogy_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "unit_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Unit Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Genealogy"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Part lots in a serial",
+        "tags": [
+          "production"
+        ]
+      }
+    },
     "/api/settings/branding": {
       "get": {
         "operationId": "branding_api_settings_branding_get",
@@ -13489,6 +15568,183 @@
         "summary": "Production stage templates",
         "tags": [
           "org"
+        ]
+      },
+      "post": {
+        "operationId": "create_template_api_stage_templates_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TemplateCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/app__modules__production__schemas__TemplateOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create a stage template",
+        "tags": [
+          "production"
+        ]
+      }
+    },
+    "/api/stage-templates/{template_id}": {
+      "delete": {
+        "operationId": "delete_template_api_stage_templates__template_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "template_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Template Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "row_version",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "title": "Row Version",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete an unused template",
+        "tags": [
+          "production"
+        ]
+      },
+      "get": {
+        "operationId": "get_template_api_stage_templates__template_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "template_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Template Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/app__modules__production__schemas__TemplateOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "One stage template",
+        "tags": [
+          "production"
+        ]
+      },
+      "put": {
+        "operationId": "update_template_api_stage_templates__template_id__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "template_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Template Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TemplateUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/app__modules__production__schemas__TemplateOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Edit steps (order, QC)",
+        "tags": [
+          "production"
         ]
       }
     },
@@ -14261,6 +16517,813 @@
         "summary": "Update a vendor",
         "tags": [
           "procurement"
+        ]
+      }
+    },
+    "/api/work-order-stages/{stage_id}/progress": {
+      "post": {
+        "operationId": "record_progress_api_work_order_stages__stage_id__progress_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "stage_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Stage Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgressIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProgressOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Start, finish (awaiting QC) or complete a stage for a lot or serial",
+        "tags": [
+          "production"
+        ]
+      }
+    },
+    "/api/work-orders": {
+      "get": {
+        "operationId": "list_wos_api_work_orders_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "project_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Project Id"
+            }
+          },
+          {
+            "description": "Comma-separated statuses",
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Comma-separated statuses",
+              "title": "Status"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/WoOut"
+                  },
+                  "title": "Response List Wos Api Work Orders Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Work orders",
+        "tags": [
+          "production"
+        ]
+      },
+      "post": {
+        "operationId": "create_wo_api_work_orders_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WoCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WoDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create a work order",
+        "tags": [
+          "production"
+        ]
+      }
+    },
+    "/api/work-orders/{wo_id}": {
+      "get": {
+        "operationId": "get_wo_api_work_orders__wo_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "wo_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Wo Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WoDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "One work order",
+        "tags": [
+          "production"
+        ]
+      },
+      "put": {
+        "operationId": "update_wo_api_work_orders__wo_id__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "wo_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Wo Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WoUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WoDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Edit a draft work order",
+        "tags": [
+          "production"
+        ]
+      }
+    },
+    "/api/work-orders/{wo_id}/cancel": {
+      "post": {
+        "operationId": "cancel_wo_api_work_orders__wo_id__cancel_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "wo_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Wo Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VersionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WoDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Cancel",
+        "tags": [
+          "production"
+        ]
+      }
+    },
+    "/api/work-orders/{wo_id}/close": {
+      "post": {
+        "operationId": "close_wo_api_work_orders__wo_id__close_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "wo_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Wo Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VersionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WoDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Close a completed order",
+        "tags": [
+          "production"
+        ]
+      }
+    },
+    "/api/work-orders/{wo_id}/kit": {
+      "get": {
+        "operationId": "kit_api_work_orders__wo_id__kit_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "wo_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Wo Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KitOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Kit list and shortages",
+        "tags": [
+          "production"
+        ]
+      }
+    },
+    "/api/work-orders/{wo_id}/kit/issue": {
+      "post": {
+        "operationId": "issue_api_work_orders__wo_id__kit_issue_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "wo_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Wo Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KitBatchIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/KitRecord"
+                  },
+                  "title": "Response Issue Api Work Orders  Wo Id  Kit Issue Post",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Issue parts to the work order (ledger ISSUE)",
+        "tags": [
+          "production"
+        ]
+      }
+    },
+    "/api/work-orders/{wo_id}/kit/records": {
+      "get": {
+        "operationId": "kit_records_api_work_orders__wo_id__kit_records_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "wo_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Wo Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/KitRecord"
+                  },
+                  "title": "Response Kit Records Api Work Orders  Wo Id  Kit Records Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Issues and returns",
+        "tags": [
+          "production"
+        ]
+      }
+    },
+    "/api/work-orders/{wo_id}/kit/return": {
+      "post": {
+        "operationId": "return_parts_api_work_orders__wo_id__kit_return_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "wo_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Wo Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KitIssueIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KitRecord"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Return unused parts (ledger RETURN)",
+        "tags": [
+          "production"
+        ]
+      }
+    },
+    "/api/work-orders/{wo_id}/labels.pdf": {
+      "get": {
+        "operationId": "labels_pdf_api_work_orders__wo_id__labels_pdf_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "wo_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Wo Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/pdf": {}
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Serial labels with QR codes (PDF, A4 3x8)",
+        "tags": [
+          "production"
+        ]
+      }
+    },
+    "/api/work-orders/{wo_id}/progress": {
+      "get": {
+        "operationId": "progress_api_work_orders__wo_id__progress_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "wo_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Wo Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ProgressOut"
+                  },
+                  "title": "Response Progress Api Work Orders  Wo Id  Progress Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Stage progress",
+        "tags": [
+          "production"
+        ]
+      }
+    },
+    "/api/work-orders/{wo_id}/release": {
+      "post": {
+        "operationId": "release_wo_api_work_orders__wo_id__release_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "wo_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Wo Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReleaseIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WoDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Release (needs clear to build, or a PM override with a reason)",
+        "tags": [
+          "production"
+        ]
+      }
+    },
+    "/api/work-orders/{wo_id}/serials": {
+      "post": {
+        "operationId": "generate_serials_api_work_orders__wo_id__serials_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "wo_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Wo Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SerialsIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/UnitOut"
+                  },
+                  "title": "Response Generate Serials Api Work Orders  Wo Id  Serials Post",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Generate serials",
+        "tags": [
+          "production"
+        ]
+      }
+    },
+    "/api/work-orders/{wo_id}/units": {
+      "get": {
+        "operationId": "units_api_work_orders__wo_id__units_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "wo_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Wo Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/UnitOut"
+                  },
+                  "title": "Response Units Api Work Orders  Wo Id  Units Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Serialised units",
+        "tags": [
+          "production"
         ]
       }
     }

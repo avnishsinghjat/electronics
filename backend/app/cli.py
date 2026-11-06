@@ -24,6 +24,7 @@ from app.seed import (
     seed_sample_boqs,
     seed_sample_data,
     seed_sample_procurement,
+    seed_sample_production,
 )
 from app.worker import heartbeat_is_fresh
 
@@ -33,6 +34,7 @@ SEEDERS: list[tuple[str, Seeder]] = [
     ("sample data", seed_sample_data),
     ("sample BOQs", seed_sample_boqs),
     ("sample purchasing", seed_sample_procurement),
+    ("sample production", seed_sample_production),
 ]
 
 

@@ -26,7 +26,7 @@ from app.modules.org.models import Division, Module, PcbAssembly, Project, Proje
 from app.modules.parts.models import Part, PartCategory, PartPreferredVendor
 from app.modules.procurement.models import Vendor
 from app.modules.production.models import DEFAULT_STAGES, StageTemplate, StageTemplateStep
-from app.modules.settings.models import DEFAULT_ATTRITION
+from app.modules.settings.models import DEFAULT_ATTRITION, CompanySettings
 
 SAMPLE_NOTE = "SAMPLE DATA: created by the seed script for demonstration. Safe to delete."
 
@@ -889,3 +889,140 @@ async def seed_sample_procurement(session: AsyncSession) -> int:
     )
     await session.flush()
     return created + 1 + len(receipt)
+
+
+async def seed_sample_production(session: AsyncSession) -> int:
+    """Two work orders for the sample CPU board: a planned one (waiting to be clear to
+    build) and a pilot lot of 5 released with a recorded override, serialised, kitted
+    through the first stage, with two units in SMT."""
+    from app.core.audit import AuditAction, record_event
+    from app.modules.org.models import BuildLot, SerialUnit
+    from app.modules.production import service as production
+    from app.modules.production.models import (
+        StageProgress,
+        StageStatus,
+        WorkOrder,
+        WorkOrderStage,
+        WoStatus,
+    )
+
+    if await _exists(session, WorkOrder, notes=SAMPLE_NOTE):
+        return 0
+    row = (
+        await session.execute(
+            select(Project, Module, PcbAssembly)
+            .join(Module, Module.project_id == Project.id)
+            .join(PcbAssembly, PcbAssembly.module_id == Module.id)
+            .where(
+                Project.is_sample.is_(True), Module.code == "MOD-CPU", PcbAssembly.code == "CPU1"
+            )
+        )
+    ).first()
+    if row is None:
+        return 0
+    project, module, assembly = row
+    boq_id = (
+        await session.execute(select(Boq.id).where(Boq.name == SAMPLE_BOQ_NAME))
+    ).scalar_one_or_none()
+    template_id = (
+        assembly.stage_template_id
+        or (
+            await session.execute(
+                select(StageTemplate.id).where(StageTemplate.is_default.is_(True))
+            )
+        ).scalar_one()
+    )
+    steps = await production.template_steps(session, template_id)
+    created = 0
+    orders = []
+    for qty, status, override in (
+        (20, WoStatus.DRAFT, None),
+        (5, WoStatus.RELEASED, "Sample: client approved a pilot lot of 5 before all parts arrived"),
+    ):
+        wo = WorkOrder(
+            number=await next_number(session, "WO"),
+            project_id=project.id,
+            module_id=module.id,
+            assembly_id=assembly.id,
+            boq_id=boq_id,
+            build_qty=qty,
+            status=status.value,
+            released_at=utcnow() if status == WoStatus.RELEASED else None,
+            release_override_reason=override,
+            track_serials=True,
+            notes=SAMPLE_NOTE,
+        )
+        session.add(wo)
+        await session.flush()
+        for step in steps:
+            session.add(
+                WorkOrderStage(
+                    work_order_id=wo.id,
+                    seq=step.seq,
+                    stage_code=step.stage_code,
+                    name=step.name,
+                    requires_qc=step.requires_qc,
+                )
+            )
+        session.add(
+            BuildLot(
+                assembly_id=assembly.id,
+                work_order_id=wo.id,
+                lot_number=await next_number(session, "LOT"),
+                qty=qty,
+            )
+        )
+        await session.flush()
+        if override:
+            await record_event(
+                session,
+                AuditAction.RELEASE_OVERRIDE,
+                entity_type="work_orders",
+                entity_id=str(wo.id),
+                details={"number": wo.number, "reason": override},
+            )
+        orders.append(wo)
+        created += 2 + len(steps)
+    pilot = orders[1]
+    lot = await production.lot_of(session, pilot.id)
+    assert lot is not None
+    company = (await session.execute(select(CompanySettings))).scalar_one_or_none()
+    prefix = company.serial_prefix if company else "SN"
+    year = utcnow().year
+    units = [
+        SerialUnit(
+            assembly_id=assembly.id,
+            lot_id=lot.id,
+            serial_number=production.serial_format(prefix, assembly.code, year, n),
+        )
+        for n in await production._next_serials(session, assembly.id, lot.qty)
+    ]
+    session.add_all(units)
+    await session.flush()
+    stages = await production.stages_of(session, pilot.id)
+    now = utcnow()
+    for u in units:  # kitting done for every unit
+        session.add(
+            StageProgress(
+                work_order_stage_id=stages[0].id,
+                lot_id=lot.id,
+                serial_unit_id=u.id,
+                status=StageStatus.COMPLETED.value,
+                started_at=now,
+                completed_at=now,
+                qty_passed=1,
+            )
+        )
+    for u in units[:2]:  # two boards on the SMT line
+        session.add(
+            StageProgress(
+                work_order_stage_id=stages[1].id,
+                lot_id=lot.id,
+                serial_unit_id=u.id,
+                status=StageStatus.IN_PROGRESS.value,
+                started_at=now,
+            )
+        )
+    await session.flush()
+    await production._refresh_statuses(session, pilot)
+    return created + len(units) * 2 + 2

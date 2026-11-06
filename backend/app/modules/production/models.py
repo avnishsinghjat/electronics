@@ -3,11 +3,23 @@
 import enum
 import uuid
 from datetime import date, datetime
+from decimal import Decimal
 
-from sqlalchemy import Boolean, CheckConstraint, Date, Index, Integer, String, Text, text
+from sqlalchemy import (
+    BigInteger,
+    Boolean,
+    CheckConstraint,
+    Date,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    Text,
+    text,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.core.models import Base, BusinessMixin, enum_check, fk, status_column
+from app.core.models import Base, BusinessMixin, Qty, enum_check, fk, status_column
 
 
 class StageCode(enum.StrEnum):
@@ -114,6 +126,8 @@ class WorkOrder(BusinessMixin, Base):
     planned_end: Mapped[date | None] = mapped_column(Date)
     released_at: Mapped[datetime | None]
     release_override_reason: Mapped[str | None] = mapped_column(Text)
+    # The BOQ this order is kitted from (its current revision at kitting time).
+    boq_id: Mapped[uuid.UUID | None] = fk("boqs.id", nullable=True)
     track_serials: Mapped[bool] = mapped_column(Boolean, default=True)
     notes: Mapped[str | None] = mapped_column(Text)
 
@@ -140,6 +154,20 @@ class StageProgress(BusinessMixin, Base):
 
     __tablename__ = "stage_progress"
     __table_args__ = (
+        Index(
+            "uq_stage_progress_stage_lot",
+            "work_order_stage_id",
+            "lot_id",
+            unique=True,
+            postgresql_where=text("serial_unit_id IS NULL AND is_deleted = false"),
+        ),
+        Index(
+            "uq_stage_progress_stage_serial",
+            "work_order_stage_id",
+            "serial_unit_id",
+            unique=True,
+            postgresql_where=text("serial_unit_id IS NOT NULL AND is_deleted = false"),
+        ),
         enum_check("status", StageStatus),
         CheckConstraint("qty_passed >= 0 AND qty_failed >= 0", name="qty_nonneg"),
         CheckConstraint(
@@ -158,3 +186,45 @@ class StageProgress(BusinessMixin, Base):
     qty_failed: Mapped[int] = mapped_column(Integer, default=0)
     operator_id: Mapped[uuid.UUID | None] = fk("users.id", nullable=True)
     notes: Mapped[str | None] = mapped_column(Text)
+
+
+class KitKind(enum.StrEnum):
+    ISSUE = "issue"
+    RETURN = "return"
+
+
+class KitIssue(BusinessMixin, Base):
+    """Parts issued to (or returned from) a work order against a BOQ line. Each row is
+    backed by one inventory ledger entry (ISSUE or RETURN, ref boq_line) and records the
+    part lot, which is what unit genealogy reads."""
+
+    __tablename__ = "kit_issues"
+    __table_args__ = (
+        CheckConstraint("qty > 0", name="qty_pos"),
+        enum_check("kind", KitKind),
+    )
+
+    work_order_id: Mapped[uuid.UUID] = fk("work_orders.id")
+    boq_line_id: Mapped[uuid.UUID] = fk("boq_lines.id")
+    part_id: Mapped[uuid.UUID] = fk("parts.id")
+    location_id: Mapped[uuid.UUID] = fk("inventory_locations.id")
+    kind: Mapped[str] = mapped_column(String(8), default=KitKind.ISSUE.value)
+    qty: Mapped[Decimal] = mapped_column(Qty)
+    lot_code: Mapped[str | None] = mapped_column(String(64), index=True)
+    ledger_entry_id: Mapped[int] = mapped_column(
+        BigInteger, ForeignKey("inventory_ledger.id", ondelete="RESTRICT"), index=True
+    )
+    note: Mapped[str | None] = mapped_column(Text)
+
+
+class SerialSequence(Base):
+    """Running number per assembly and year for serial numbers; incremented under a row
+    lock so concurrent generation never repeats a number."""
+
+    __tablename__ = "serial_sequences"
+
+    assembly_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("pcb_assemblies.id", ondelete="CASCADE"), primary_key=True
+    )
+    year: Mapped[int] = mapped_column(Integer, primary_key=True)
+    last_value: Mapped[int] = mapped_column(Integer, default=0)

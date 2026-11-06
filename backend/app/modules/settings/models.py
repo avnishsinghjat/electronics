@@ -37,6 +37,8 @@ class CompanySettings(BusinessMixin, Base):
     logo_file_id: Mapped[uuid.UUID | None] = fk("files.id", nullable=True)
     setup_completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     store_llm_transcripts: Mapped[bool] = mapped_column(Boolean, default=False)
+    # Serial numbers: {serial_prefix}-{assembly code}-{year}-{running number}.
+    serial_prefix: Mapped[str] = mapped_column(String(16), default="SN", server_default="SN")
     attrition_defaults: Mapped[dict[str, Any]] = mapped_column(
         JsonB, default=lambda: dict(DEFAULT_ATTRITION)
     )

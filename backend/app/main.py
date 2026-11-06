@@ -22,6 +22,7 @@ from app.modules.inventory.router import router as inventory_router
 from app.modules.org.router import router as org_router
 from app.modules.parts.router import router as parts_router
 from app.modules.procurement.router import router as procurement_router
+from app.modules.production.router import router as production_router
 from app.modules.settings.router import router as settings_router
 from app.modules.users.router import router as users_router
 
@@ -72,6 +73,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         boq_router,
         procurement_router,
         inventory_router,
+        production_router,
     ):
         app.include_router(router, prefix=API_PREFIX)
     return app

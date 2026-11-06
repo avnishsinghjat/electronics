@@ -289,6 +289,23 @@ async def test_po_pdf(ctx: Ctx) -> None:
     assert context["draft"] is True and context["total"] == "3,400.00"
     assert context["lines"][0]["mpn"] == "GRM188R71H104KA93D"
     assert context["company"]["name"] == "Test Electronics"
+    # With the company logo on the letterhead (embedded as a data URI).
+    png = bytes.fromhex(
+        "89504e470d0a1a0a0000000d4948445200000001000000010804000000b51c0c02"
+        "0000000b4944415478da63646000000006000230819d0f0000000049454e44ae426082"
+    )
+    admin = uuid.uuid4().hex[:8]
+    from tests.factories import login as _login
+    from tests.factories import make_user as _make_user
+
+    await _make_user(ctx.session, f"logo_{admin}", roles=("admin",))
+    h = await _login(ctx.client, f"logo_{admin}")
+    up = await ctx.client.post(
+        "/api/settings/logo", headers=h, files={"file": ("logo.png", png, "image/png")}
+    )
+    assert up.status_code in (200, 204), up.text
+    r = await ctx.client.get(f"/api/purchase-orders/{po['id']}/pdf", headers=ctx.buyer)
+    assert r.status_code == 200 and r.content.startswith(b"%PDF") and b"/Image" in r.content
 
 
 async def test_sample_purchasing_seed(ctx: Ctx) -> None:

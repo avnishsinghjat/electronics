@@ -135,3 +135,10 @@ class ReservationOut(BaseModel):
 
 class VersionIn(BaseModel):
     row_version: int
+
+
+class LotStockOut(BaseModel):
+    location_id: uuid.UUID
+    location_code: str
+    lot_code: str | None
+    qty: Decimal

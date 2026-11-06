@@ -14,6 +14,7 @@ class CompanyOut(BaseModel):
     company_name: str
     address: str | None
     gstin: str | None
+    serial_prefix: str
     has_logo: bool
     row_version: int
 
@@ -25,6 +26,7 @@ class CompanyUpdate(BaseModel):
     gstin: str | None = Field(
         default=None, pattern=r"^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$"
     )
+    serial_prefix: str = Field(default="SN", pattern=r"^[A-Z0-9]{1,8}$")
 
 
 class NumberingOut(BaseModel):

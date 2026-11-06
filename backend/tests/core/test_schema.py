@@ -112,5 +112,7 @@ def test_domain_model_tables_exist() -> None:
         "boq_mapping_templates",
         "grn_allocations",
         "stock_adjustments",
+        "kit_issues",
+        "serial_sequences",
     }
     assert expected == set(Base.metadata.tables)

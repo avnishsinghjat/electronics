@@ -109,6 +109,7 @@ async def update_company(
     company.company_name = data.company_name
     company.address = data.address
     company.gstin = data.gstin
+    company.serial_prefix = data.serial_prefix
     await session.commit()
     return company
 
