@@ -1025,4 +1025,71 @@ async def seed_sample_production(session: AsyncSession) -> int:
         )
     await session.flush()
     await production._refresh_statuses(session, pilot)
+    # Kit what is actually in stores (the sample purchase received three lines in part).
+    created += await _sample_kit(session, pilot)
     return created + len(units) * 2 + 2
+
+
+async def _sample_kit(session: AsyncSession, wo: object) -> int:
+    from app.modules.boq.status import required_qty
+    from app.modules.inventory import service as inventory
+    from app.modules.production.models import KitIssue, KitKind, WorkOrder
+
+    assert isinstance(wo, WorkOrder)
+    if wo.boq_id is None:
+        return 0
+    rev = (
+        await session.execute(
+            select(BoqRevision).where(
+                BoqRevision.boq_id == wo.boq_id, BoqRevision.status == "released"
+            )
+        )
+    ).scalar_one_or_none()
+    if rev is None:
+        return 0
+    lines = (
+        (await session.execute(select(BoqLine).where(BoqLine.revision_id == rev.id)))
+        .scalars()
+        .all()
+    )
+    n = 0
+    for ln in lines:
+        if ln.part_id is None:
+            continue
+        need = required_qty(
+            ln.qty_per_unit, wo.build_qty, ln.attrition_pct, unit=ln.unit, dnp=ln.dnp
+        )
+        for loc, lot, qty in await inventory.lot_stock(session, ln.part_id):
+            take = min(need, qty)
+            if take <= 0:
+                break
+            entry = await inventory.issue_to_boq_line(
+                session,
+                part_id=ln.part_id,
+                location_id=loc.id,
+                qty=take,
+                boq_line_id=ln.id,
+                project_id=wo.project_id,
+                lot_code=lot,
+                note=f"Kitted to {wo.number}",
+            )
+            await inventory.consume_reservations(
+                session, part_id=ln.part_id, project_id=wo.project_id, qty=take
+            )
+            session.add(
+                KitIssue(
+                    work_order_id=wo.id,
+                    boq_line_id=ln.id,
+                    part_id=ln.part_id,
+                    location_id=loc.id,
+                    kind=KitKind.ISSUE.value,
+                    qty=take,
+                    lot_code=lot,
+                    ledger_entry_id=entry.id,
+                    note=SAMPLE_NOTE,
+                )
+            )
+            need -= take
+            n += 1
+    await session.flush()
+    return n

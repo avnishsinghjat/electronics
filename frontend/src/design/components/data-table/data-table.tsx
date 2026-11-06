@@ -77,6 +77,15 @@ function usePrinting(): boolean {
   return printing;
 }
 
+/** Render a column's header or cell. Unlike TanStack's flexRender, a function is CALLED,
+ *  not mounted as a component: column definitions written inside a component are new
+ *  functions on every render, and mounting them would remount every cell (losing a click
+ *  that lands while data refreshes). Cell renderers therefore must not use hooks. */
+function renderSlot<P extends object>(slot: unknown, props: P): React.ReactNode {
+  if (typeof slot === "function") return (slot as (p: P) => React.ReactNode)(props);
+  return flexRender(slot as React.ReactNode, props);
+}
+
 export interface DataTableProps<T> {
   /** Stable id: saved views are stored under it. */
   id: string;
@@ -457,11 +466,11 @@ export function DataTable<T>({
                         onClick={col.getToggleSortingHandler()}
                         className={cn("inline-flex items-center gap-1 rounded hover:text-neutral-900 focus-visible:shadow-focus focus-visible:outline-none", align === "right" && "flex-row-reverse")}
                       >
-                        {flexRender(col.columnDef.header, header.getContext())}
+                        {renderSlot(col.columnDef.header, header.getContext())}
                         {sorted === "asc" ? <ArrowUp className="size-3" /> : sorted === "desc" ? <ArrowDown className="size-3" /> : <ArrowUpDown className="size-3 text-neutral-400" />}
                       </button>
                     ) : (
-                      flexRender(col.columnDef.header, header.getContext())
+                      renderSlot(col.columnDef.header, header.getContext())
                     )}
                   </th>
                 );
@@ -544,7 +553,7 @@ export function DataTable<T>({
                               cell.column.getIsPinned() && "border-r border-r-neutral-200 bg-white group-hover:bg-neutral-25",
                             )}
                           >
-                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                            {renderSlot(cell.column.columnDef.cell, cell.getContext())}
                           </td>
                         );
                       })}

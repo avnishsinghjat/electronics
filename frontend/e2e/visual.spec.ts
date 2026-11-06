@@ -23,7 +23,7 @@ for (const size of SIZES) {
     test("shell: collapsed sidebar on a roadmap section", async ({ page }) => {
       await stubHealth(page);
       await stubDivisions(page);
-      await page.goto("/production");
+      await page.goto("/qc");
       await page.getByRole("button", { name: "Collapse sidebar" }).click();
       await expect(page.getByRole("button", { name: "Expand sidebar" })).toBeVisible();
       await fontsReady(page);

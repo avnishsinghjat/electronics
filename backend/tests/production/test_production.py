@@ -703,3 +703,14 @@ async def test_sample_production_seed(ctx: Ctx) -> None:
     assert pilot["release_override_reason"].startswith("Sample:")
     draft = await ctx.get(f"/work-orders/{by_status['draft']['id']}")
     assert draft["readiness"]["clear_to_build"] is False
+    # The pilot was kitted from what is in stores: three received lines, with their lots.
+    kit = {ln["mpn"]: ln for ln in (await ctx.get(f"/work-orders/{pilot['id']}/kit"))["lines"]}
+    assert D(kit["GRM188R71H104KA93D"]["issued"]) == D(kit["GRM188R71H104KA93D"]["required"]) == 41
+    unit = (await ctx.get(f"/work-orders/{pilot['id']}/units"))[0]
+    lots = {
+        p["lot_code"] for p in (await ctx.get(f"/serial-units/{unit['id']}/genealogy"))["parts"]
+    }
+    assert lots == {"MUR-2644-A", "MUR-2640-C", "YAG-2646"}
+    from app.modules.inventory import service as inventory
+
+    assert await inventory.verify_balances(ctx.session) == []

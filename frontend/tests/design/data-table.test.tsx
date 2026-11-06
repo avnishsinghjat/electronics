@@ -1,7 +1,8 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import { screen, waitFor, within } from "@testing-library/react";
+import { act, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { strFromU8, unzipSync } from "fflate";
+import * as React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { DataTable } from "@/design/components";
@@ -200,5 +201,28 @@ describe("DataTable printing", () => {
     await waitFor(() => expect(bodyRows()).toHaveLength(500));
     window.dispatchEvent(new Event("afterprint"));
     await waitFor(() => expect(screen.getByTestId("print-scroll")).toHaveAttribute("data-virtualized", "true"));
+  });
+});
+
+describe("DataTable cell identity", () => {
+  it("keeps cell elements when the parent re-renders with new column functions", async () => {
+    let rerender: (() => void) | null = null;
+    const clicked = vi.fn();
+    function Host() {
+      const [n, setN] = React.useState(0);
+      rerender = () => setN((x) => x + 1);
+      // Columns rebuilt on every render, as pages often do.
+      const cols: ColumnDef<{ id: string }, unknown>[] = [
+        { accessorKey: "id", header: "Id" },
+        { id: "act", header: "", cell: ({ row }) => <button type="button" onClick={() => clicked(row.original.id)}>Act {row.original.id} {n >= 0 ? "" : "x"}</button> },
+      ];
+      return <DataTable id="identity" data={[{ id: "a" }]} columns={cols} getRowId={(r) => r.id} />;
+    }
+    renderUi(<Host />);
+    const before = await screen.findByRole("button", { name: /Act a/ });
+    act(() => rerender?.());
+    expect(before.isConnected).toBe(true); // not remounted, so a click in flight still lands
+    await userEvent.click(before);
+    expect(clicked).toHaveBeenCalledWith("a");
   });
 });

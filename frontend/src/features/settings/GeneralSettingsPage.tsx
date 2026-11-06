@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Save } from "lucide-react";
 import * as React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
 import { Button, Card, CardContent, CardHeader, Field, FileDropzone, Input, MonoText, Skeleton, Textarea, toast } from "@/design/components";
@@ -14,6 +14,7 @@ import { type Company, useCompany, useNumbering, useSaveCompany, useSavePrefix, 
 const companySchema = z.object({
   company_name: z.string().trim().min(1, "Enter the company name").max(200),
   address: z.string().max(500),
+  serial_prefix: z.string().trim().regex(/^[A-Z0-9]{1,8}$/, "1-8 capital letters or digits"),
   gstin: z.union([z.literal(""), z.string().regex(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/, "Not a valid 15-character GSTIN")]),
 });
 type CompanyForm = z.infer<typeof companySchema>;
@@ -22,11 +23,12 @@ function CompanyCard({ company, canEdit }: { company: Company; canEdit: boolean 
   const save = useSaveCompany();
   const form = useForm<CompanyForm>({
     resolver: zodResolver(companySchema),
-    values: { company_name: company.company_name, address: company.address ?? "", gstin: company.gstin ?? "" },
+    values: { company_name: company.company_name, address: company.address ?? "", gstin: company.gstin ?? "", serial_prefix: company.serial_prefix },
   });
+  const prefix = useWatch({ control: form.control, name: "serial_prefix" });
   const onSubmit = form.handleSubmit(async (v) => {
     try {
-      await save.mutateAsync({ row_version: company.row_version, company_name: v.company_name, address: v.address || null, gstin: v.gstin || null });
+      await save.mutateAsync({ row_version: company.row_version, company_name: v.company_name, address: v.address || null, gstin: v.gstin || null, serial_prefix: v.serial_prefix });
       toast.success("Company details saved");
     } catch (err) {
       toast.error(err instanceof ApiError ? err.message : "Could not save");
@@ -42,6 +44,9 @@ function CompanyCard({ company, canEdit }: { company: Company; canEdit: boolean 
           </Field>
           <Field label="GSTIN" htmlFor="gstin" hint="15 characters, e.g. 27AABCS1234F1Z5" error={form.formState.errors.gstin?.message}>
             <Input disabled={!canEdit} className="font-mono uppercase" {...form.register("gstin", { setValueAs: (v: string) => v.toUpperCase().trim() })} />
+          </Field>
+          <Field label="Serial number prefix" htmlFor="serial_prefix" hint={`Serials look like ${prefix || "SN"}-CPU1-${new Date().getFullYear()}-00001`} error={form.formState.errors.serial_prefix?.message}>
+            <Input disabled={!canEdit} className="font-mono uppercase" {...form.register("serial_prefix", { setValueAs: (v: string) => v.toUpperCase().trim() })} />
           </Field>
           <Field label="Address" htmlFor="address" className="md:col-span-2" error={form.formState.errors.address?.message}>
             <Textarea disabled={!canEdit} rows={3} {...form.register("address")} />

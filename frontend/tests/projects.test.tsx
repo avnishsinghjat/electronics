@@ -136,7 +136,7 @@ describe("Project page", () => {
     renderAt("/projects/p1");
     expect(await screen.findByRole("heading", { level: 1, name: "PLC Rack" })).toBeInTheDocument();
     const tabs = screen.getByRole("tablist", { name: "Project sections" });
-    expect(within(tabs).getAllByRole("tab").map((t) => t.textContent)).toEqual(["Overview", "BOQ", "Procurement", "Files", "History"]);
+    expect(within(tabs).getAllByRole("tab").map((t) => t.textContent)).toEqual(["Overview", "BOQ", "Procurement", "Production", "Files", "History"]);
     const structure = screen.getByRole("region", { name: "Module MOD-CPU" });
     expect(within(structure).getByText("CPU board")).toBeInTheDocument();
     expect(within(structure).getByText("100 × 80")).toBeInTheDocument();
@@ -151,8 +151,8 @@ describe("Project page", () => {
   it("previews unbuilt tabs with the phase that delivers them when enabled", async () => {
     localStorage.setItem("fabtrack.preview-tabs", "1");
     mockApi(base({ "GET /projects/p1/tree": () => TREE }));
-    renderAt("/projects/p1?tab=production");
-    expect(await screen.findByRole("heading", { name: "Production for this project is delivered in Phase 7" })).toBeInTheDocument();
+    renderAt("/projects/p1?tab=qc");
+    expect(await screen.findByRole("heading", { name: "QC for this project is delivered in Phase 8" })).toBeInTheDocument();
     expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual(["Overview", "BOQ", "Procurement", "Production", "QC", "Documents", "Files", "History"]);
   });
 

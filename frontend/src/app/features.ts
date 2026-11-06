@@ -20,7 +20,7 @@ export type FeatureName = keyof typeof FEATURES;
 export const PROJECT_TABS: Record<string, { label: string; phase: number; live: boolean }> = {
   boq: { label: "BOQ", phase: 5, live: true },
   procurement: { label: "Procurement", phase: 6, live: true },
-  production: { label: "Production", phase: 7, live: false },
+  production: { label: "Production", phase: 7, live: true },
   qc: { label: "QC", phase: 8, live: false },
   documents: { label: "Documents", phase: 11, live: false },
 };

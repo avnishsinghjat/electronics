@@ -93,10 +93,10 @@ describe("General settings", () => {
     let prefixBody: unknown = null;
     mockApi(
       signedInRoutes(makeMe(), {
-        "GET /settings/company": () => ({ company_name: "Old Co", address: null, gstin: null, has_logo: false, row_version: 4 }),
+        "GET /settings/company": () => ({ company_name: "Old Co", address: null, gstin: null, serial_prefix: "SN", has_logo: false, row_version: 4 }),
         "PUT /settings/company": ({ body }) => {
           companyBody = body;
-          return { company_name: "New Co", address: null, gstin: "27AABCS1234F1Z5", has_logo: false, row_version: 5 };
+          return { company_name: "New Co", address: null, gstin: "27AABCS1234F1Z5", serial_prefix: "SN", has_logo: false, row_version: 5 };
         },
         "GET /settings/numbering": () => [{ doc_type: "PO", description: "Purchase order", prefix: "PO", padding: 4, yearly_reset: true, example: "PO-2026-0001" }],
         "PUT /settings/numbering/PO": ({ body }) => {
@@ -116,7 +116,7 @@ describe("General settings", () => {
     await userEvent.clear(screen.getByLabelText(/GSTIN/));
     await userEvent.type(screen.getByLabelText(/GSTIN/), "27aabcs1234f1z5");
     await userEvent.click(screen.getByRole("button", { name: /Save company details/ }));
-    await waitFor(() => expect(companyBody).toEqual({ row_version: 4, company_name: "New Co", address: null, gstin: "27AABCS1234F1Z5" }));
+    await waitFor(() => expect(companyBody).toEqual({ row_version: 4, company_name: "New Co", address: null, gstin: "27AABCS1234F1Z5", serial_prefix: "SN" }));
 
     const prefix = screen.getByLabelText("Prefix for Purchase order");
     await userEvent.clear(prefix);

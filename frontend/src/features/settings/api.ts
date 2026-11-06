@@ -7,6 +7,7 @@ export interface Company {
   company_name: string;
   address: string | null;
   gstin: string | null;
+  serial_prefix: string;
   has_logo: boolean;
   row_version: number;
 }

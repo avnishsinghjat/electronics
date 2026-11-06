@@ -1,7 +1,7 @@
-import { lazy } from "react";
+import { Suspense, lazy } from "react";
 import { Navigate, type RouteObject, createBrowserRouter } from "react-router-dom";
 
-import { RequireAuth, RequirePermission } from "@/features/auth/RequireAuth";
+import { FullPageLoading, RequireAuth, RequirePermission } from "@/features/auth/RequireAuth";
 import RoadmapPage from "@/features/roadmap/RoadmapPage";
 import { SettingsIndex } from "@/features/settings/SettingsLayout";
 
@@ -26,10 +26,13 @@ const RequisitionPage = lazy(() => import("@/features/procurement/RequisitionPag
 const PurchaseOrderPage = lazy(() => import("@/features/procurement/PurchaseOrderPage"));
 const ReceiptPage = lazy(() => import("@/features/procurement/ReceiptPage"));
 const InventoryPage = lazy(() => import("@/features/inventory/InventoryPage"));
+const ProductionPage = lazy(() => import("@/features/production/ProductionPage"));
+const WorkOrderPage = lazy(() => import("@/features/production/WorkOrderPage"));
+const ShopFloorPage = lazy(() => import("@/features/production/ShopFloorPage"));
 
 /** Sections whose module is not built yet render the roadmap page. Each phase replaces
  *  its entry with the real lazily-loaded feature route. */
-const BUILT = new Set(["dashboard", "settings", "projects", "boq", "procurement", "inventory"]);
+const BUILT = new Set(["dashboard", "settings", "projects", "boq", "procurement", "inventory", "production"]);
 const roadmapRoutes: RouteObject[] = NAV_ITEMS.filter((n) => !BUILT.has(n.id)).map((n) => ({
   path: n.to.slice(1),
   element: (
@@ -48,6 +51,17 @@ export const routes: RouteObject[] = [
     errorElement: <ErrorPage />,
     children: [
       {
+        // Full-screen tablet layout, outside the app shell.
+        path: "/shop-floor",
+        element: (
+          <RequirePermission permission="production:read">
+            <Suspense fallback={<FullPageLoading />}>
+              <ShopFloorPage />
+            </Suspense>
+          </RequirePermission>
+        ),
+      },
+      {
         path: "/",
         element: <Shell />,
         children: [
@@ -65,6 +79,8 @@ export const routes: RouteObject[] = [
               { path: "procurement/orders/:poId", element: <RequirePermission permission="procurement:read"><PurchaseOrderPage /></RequirePermission> },
               { path: "procurement/receipts/:grnId", element: <RequirePermission permission="procurement:read"><ReceiptPage /></RequirePermission> },
               { path: "inventory", element: <RequirePermission permission="inventory:read"><InventoryPage /></RequirePermission> },
+              { path: "production", element: <RequirePermission permission="production:read"><ProductionPage /></RequirePermission> },
+              { path: "production/work-orders/:woId", element: <RequirePermission permission="production:read"><WorkOrderPage /></RequirePermission> },
               {
                 path: "settings",
                 element: (

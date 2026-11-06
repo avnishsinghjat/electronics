@@ -27,6 +27,7 @@ import {
 import type { StatusTone } from "@/design/tokens";
 import { Attachments } from "@/features/attachments/Attachments";
 import { TrackerPanel } from "@/features/procurement/TrackerPanel";
+import { ProjectProductionPanel } from "@/features/production/ProjectProductionPanel";
 import { BoqPanel } from "@/features/boq/BoqPanel";
 import { useCan } from "@/features/auth/AuthContext";
 import { ApiError } from "@/lib/api";
@@ -230,6 +231,7 @@ export default function ProjectPage() {
   const canHistory = useCan("projects:history");
   const canBoq = useCan("boq:read");
   const canProcurement = useCan("procurement:read");
+  const canProduction = useCan("production:read");
   const tree = useProjectTree(projectId);
   const { deleteProject } = useOrgMutations();
   const [editing, setEditing] = React.useState(false);
@@ -261,7 +263,7 @@ export default function ProjectPage() {
 
   const p = tree.data.project;
   const s = statusInfo(p.status);
-  const allowed: Record<string, boolean> = { boq: canBoq, procurement: canProcurement };
+  const allowed: Record<string, boolean> = { boq: canBoq, procurement: canProcurement, production: canProduction };
   const extraTabs = Object.entries(PROJECT_TABS).filter(([key, t]) => (t.live && (allowed[key] ?? true)) || preview);
 
   return (
@@ -327,6 +329,8 @@ export default function ProjectPage() {
               <BoqPanel tree={tree.data} />
             ) : key === "procurement" && t.live ? (
               <TrackerPanel projectId={p.id} />
+            ) : key === "production" && t.live ? (
+              <ProjectProductionPanel tree={tree.data} />
             ) : (
               <RoadmapTab label={t.label} phase={t.phase} />
             )}

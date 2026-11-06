@@ -142,8 +142,8 @@ export const useProjects = (f: ProjectFilters) =>
     placeholderData: keepPreviousData,
   });
 
-export const useProjectTree = (id: string) =>
-  useQuery({ queryKey: projectKeys.tree(id), queryFn: ({ signal }) => apiGet<ProjectTree>(`/projects/${id}/tree`, signal) });
+export const useProjectTree = (id: string | null) =>
+  useQuery({ queryKey: projectKeys.tree(id ?? ""), queryFn: ({ signal }) => apiGet<ProjectTree>(`/projects/${id}/tree`, signal), enabled: !!id });
 
 export const useProjectHistory = (id: string, enabled: boolean) =>
   useQuery({ queryKey: projectKeys.history(id), queryFn: ({ signal }) => apiGet<HistoryEntry[]>(`/projects/${id}/history`, signal), enabled });

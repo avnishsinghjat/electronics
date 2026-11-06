@@ -198,7 +198,7 @@ export const boqKeys = {
 
 export const useAllBoqs = () => useQuery({ queryKey: boqKeys.all, queryFn: ({ signal }) => apiGet<Boq[]>("/boqs", signal) });
 export const useProjectBoqs = (projectId: string) =>
-  useQuery({ queryKey: boqKeys.project(projectId), queryFn: ({ signal }) => apiGet<Boq[]>(`/projects/${projectId}/boqs`, signal) });
+  useQuery({ queryKey: boqKeys.project(projectId), queryFn: ({ signal }) => apiGet<Boq[]>(`/projects/${projectId}/boqs`, signal), enabled: !!projectId });
 export const useRevision = (id: string | null) =>
   useQuery({ queryKey: boqKeys.revision(id ?? ""), queryFn: ({ signal }) => apiGet<RevisionDetail>(`/boq-revisions/${id}`, signal), enabled: !!id });
 export const useImportFields = () => useQuery({ queryKey: boqKeys.fields, queryFn: ({ signal }) => apiGet<FieldInfo[]>("/boq-import-fields", signal), staleTime: Infinity });

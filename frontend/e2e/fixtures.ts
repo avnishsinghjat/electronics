@@ -73,6 +73,11 @@ export async function adminApi(page: Page) {
       expect(r.ok(), await r.text()).toBe(true);
       return (await r.json()) as T;
     },
+    get: async <T>(path: string): Promise<T> => {
+      const r = await page.request.get(`/api${path}`, { headers });
+      expect(r.ok(), await r.text()).toBe(true);
+      return (await r.json()) as T;
+    },
     put: async <T>(path: string, data: unknown): Promise<T> => {
       const r = await page.request.put(`/api${path}`, { headers, data });
       expect(r.ok(), await r.text()).toBe(true);
